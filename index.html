@@ -10,54 +10,71 @@
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
   :root{
-    --bb-azul:#003399;
+    /* Banco do Brasil core */
+    --bb-azul:#0033A0; /* azul BB mais puro */
     --bb-amarelo:#FFCC00;
     --bb-azul-escuro:#001a66;
-    --bg:#0f172a;
-    --card:#0b1026;
-    --muted:#55637a;
-    --border:#1f2a44;
-    --ok:#1b5e20;
-    --mid:#f9a825;
-    --warn:#fb8c00;
-    --bad:#c62828;
-    --chip:#0d1b4d;
-    --rowA:#ffffff; /* linha branca */
-    --rowB:#ecf2ff; /* azul clarinho combinando com BB */
+
+    /* Plano de fundo geral */
+    --bg:#0b1026;
+    --border:#1b2b66;
+
+    /* Tabela (linhas alternadas) */
+    --rowA:#ffffff; /* branco */
+    --rowB:#F2F6FF; /* azul clarinho quase branco */
+
+    /* Cores de status (alto contraste p/ % atingimento) */
+    --ok-bg:#2E7D32; /* verde sólido */
+    --ok-fg:#FFFFFF;
+
+    --mid-bg:#F9A825; /* amarelo forte */
+    --mid-fg:#111827;
+
+    --warn-bg:#EF6C00; /* laranja forte */
+    --warn-fg:#FFFFFF;
+
+    --bad-bg:#C62828; /* vermelho forte */
+    --bad-fg:#FFFFFF;
   }
+
   *{box-sizing:border-box}
   body{
-    margin:0; font-family: Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-    background: radial-gradient(1200px 800px at 20% -10%, #0b1440 0%, #0a0f2b 40%, #050814 100%);
+    margin:0;
+    font-family: Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    background:
+      radial-gradient(1200px 800px at 20% -10%, #0b1440 0%, #0a0f2b 40%, #050814 100%);
     color:#e5e7eb;
   }
+
   header{
     padding:24px 20px;
-    background: linear-gradient(90deg,var(--bb-azul) 0%, #0a3ab3 40%, #0b1440 100%);
+    background: linear-gradient(90deg,var(--bb-azul) 0%, #0b3fb8 50%, #0b1440 100%);
     border-bottom:1px solid #0d1b4d;
     position:sticky; top:0; z-index:10;
   }
   .brand{display:flex; align-items:center; gap:14px; max-width:1200px; margin:0 auto;}
   .logo{
     width:44px; height:44px; border-radius:12px; background:var(--bb-amarelo);
-    box-shadow:0 6px 18px rgba(255,204,0,.3); display:grid; place-items:center; color:#111827; font-weight:900;
+    box-shadow:0 6px 18px rgba(255,204,0,.35); display:grid; place-items:center; color:#111827; font-weight:900;
   }
   h1{margin:0; font-size:20px; letter-spacing:.2px}
-  .sub{font-size:12px; color:#fef3c7}
+  .sub{font-size:12px; color:#FFF2B3}
+
   main{max-width:1200px; margin:24px auto; padding:0 20px}
   .grid{display:grid; gap:16px; grid-template-columns: 1fr;}
   @media (min-width:1000px){ .grid{grid-template-columns: 1.2fr 1fr;} }
+
   .panel{
-    background: linear-gradient(180deg, rgba(0,17,51,.7), rgba(5,12,34,.9));
+    background: linear-gradient(180deg, rgba(0,17,51,.6), rgba(5,12,34,.9));
     border:1px solid var(--border); border-radius:20px; padding:16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03);
+    box-shadow: 0 10px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03);
   }
   .panel h2{margin:0 0 10px; font-size:16px; color:#f8fafc; display:flex; align-items:center; gap:8px;}
-  .hint{color:#b6c2d6; font-size:12px; margin:6px 0 12px}
+  .hint{color:#cdd6ea; font-size:12px; margin:6px 0 12px}
   .row{display:grid; gap:8px}
   textarea{
     width:100%; min-height:120px; padding:12px 12px 40px 12px; resize:vertical;
-    border-radius:12px; border:1px solid var(--border); background:#0a0f26; color:#e5e7eb;
+    border-radius:12px; border:1px solid #203377; background:#0a1130; color:#eef2ff;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
     font-size:12px; line-height:1.4;
   }
@@ -69,67 +86,77 @@
   }
   .btn:hover{filter:brightness(1.06)}
   .btn.primary{
-    background:linear-gradient(180deg,var(--bb-amarelo),#f5b500);
-    color:#0b1026; border-color:#e0ac00; text-shadow:0 1px 0 rgba(255,255,255,.5);
+    background:linear-gradient(180deg,var(--bb-amarelo),#f2b903);
+    color:#0b1026; border-color:#e0ac00; text-shadow:0 1px 0 rgba(255,255,255,.45);
   }
   .file{display:inline-block; position:relative; overflow:hidden;}
   .file input[type=file]{position:absolute; inset:0; opacity:0; cursor:pointer}
   .pill{
     display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
-    background:var(--chip); border:1px solid #11307a; color:#dbeafe; font-size:12px
+    background:#0d1b4d; border:1px solid #12307a; color:#dbeafe; font-size:12px
   }
 
   /* ======== Painéis por Rede ======== */
   .boards{margin-top:16px; display:grid; gap:16px}
   .board{
     border:1px solid #12306b; border-radius:18px; overflow:hidden;
-    background: radial-gradient(800px 400px at 100% -100%, rgba(255,204,0,.15) 0%, rgba(17,24,39,0) 70%), linear-gradient(180deg, #071235, #050b24);
+    background:
+      radial-gradient(900px 420px at 100% -100%, rgba(255,204,0,.18) 0%, rgba(17,24,39,0) 70%),
+      linear-gradient(180deg, #061647, #051133);
     box-shadow: 0 14px 40px rgba(0,0,0,.5);
   }
   .board-head{
     display:block; padding:14px 16px;
-    background:linear-gradient(90deg,#021a54, #06286f 60%, #0a1a44);
+    background:linear-gradient(90deg,#012468, #05328e 60%, #062460);
     border-bottom:1px solid #0e2a77;
   }
+  /* Título centralizado ocupando metade do painel */
   .board-title{
     width:50%;
     margin:0 auto;
     text-align:center;
     color:#111827;
-    background:linear-gradient(180deg,#FFCC00,#f2b903);
+    background:linear-gradient(180deg,var(--bb-amarelo),#f2b903);
     padding:10px 14px;
     border-radius:999px;
     font-weight:900;
-    letter-spacing:.3px;
-    font-size:18px;
+    letter-spacing:.2px;
+    font-size:19px;
     box-shadow: 0 6px 18px rgba(255,204,0,.35);
   }
   .board-sub{
-    margin-top:8px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap; color:#cde1ff; font-size:12px;
+    margin-top:8px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap; color:#EAF1FF; font-size:12px;
   }
+
+  /* Badges de % com SÓLIDOS e contraste alto */
   .badge{
-    display:inline-flex; align-items:center; gap:6px; border-radius:999px; padding:6px 10px; font-weight:700; letter-spacing:.2px
+    display:inline-flex; align-items:center; gap:6px;
+    border-radius:999px; padding:6px 11px; font-weight:800; letter-spacing:.2px;
+    box-shadow: 0 1px 0 rgba(255,255,255,.15), 0 6px 16px rgba(0,0,0,.25);
+    font-size:13px;
   }
-  .b-ok{background:rgba(27,94,32,.15); color:#9be7a2; border:1px solid rgba(27,94,32,.6)}
-  .b-mid{background:rgba(249,168,37,.12); color:#fde68a; border:1px solid rgba(249,168,37,.6)}
-  .b-warn{background:rgba(251,140,0,.12); color:#ffdb9b; border:1px solid rgba(251,140,0,.55)}
-  .b-bad{background:rgba(198,40,40,.14); color:#fecaca; border:1px solid rgba(198,40,40,.55)}
+  .b-ok { background:var(--ok-bg); color:var(--ok-fg); border:1px solid rgba(0,0,0,.15); }
+  .b-mid { background:var(--mid-bg); color:var(--mid-fg); border:1px solid rgba(0,0,0,.15); }
+  .b-warn{ background:var(--warn-bg); color:var(--warn-fg); border:1px solid rgba(0,0,0,.15); }
+  .b-bad { background:var(--bad-bg); color:var(--bad-fg); border:1px solid rgba(0,0,0,.15); }
+
   .board-body{padding:12px 16px 8px}
 
   table{width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:12px;}
   thead th{
-    text-align:left; font-size:12px; color:#0d2b7a; padding:10px;
-    background:#e7efff; /* cabeçalho claro */
-    border-bottom:2px solid #c9dafc;
+    text-align:left; font-size:12px;
+    color:#0033A0; padding:10px;
+    background:#E9F1FF; /* cabeçalho claro azulado */
+    border-bottom:2px solid #C7D9FF;
     position:sticky; top:0; z-index:1;
   }
   tbody td{
-    padding:10px; font-size:13px; border-bottom:1px dashed #bfd0fb;
+    padding:10px; font-size:13px; border-bottom:1px dashed #C7D9FF; color:#0b1026;
   }
   /* Linhas alternadas: branco e azul clarinho */
-  tbody tr:nth-child(odd){ background:var(--rowA); color:#0b1026; }
-  tbody tr:nth-child(even){ background:var(--rowB); color:#0b1026; }
-  tbody tr:hover{outline:2px solid #b5c9ff; filter:brightness(1.01)}
+  tbody tr:nth-child(odd){ background:var(--rowA); }
+  tbody tr:nth-child(even){ background:var(--rowB); }
+  tbody tr:hover{outline:2px solid #B3CBFF; filter:brightness(1.01)}
   .right{text-align:right}
 
   .board-foot{
@@ -138,7 +165,9 @@
     background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
   }
 
-  .empty{padding:18px; color:#94a3b8; border:1px dashed #1e2a4d; border-radius:12px; background:#060b1f}
+  .empty{
+    padding:18px; color:#94a3b8; border:1px dashed #1e2a4d; border-radius:12px; background:#060b1f
+  }
   footer{max-width:1200px; margin:20px auto 60px; padding:0 20px; color:#93c5fd; font-size:12px}
   .kbd{font-family:ui-monospace,Menlo,Consolas,monospace; background:#0b122e; border:1px solid #1b2b66; padding:2px 6px; border-radius:6px}
 </style>
@@ -174,9 +203,9 @@ Maria Silva;Agência 987;Grupo C"></textarea>
 
       <hr style="border:none;border-top:1px solid var(--border); margin:16px 0" />
 
-      <h2>2) Contatos do Dia (Realizado) — **Cole 7 colunas**</h2>
+      <h2>2) Contatos do Dia (Realizado) — Cole 7 colunas</h2>
       <div class="hint">
-        Ao colar uma tabela com 7 colunas (ou mais), usaremos automaticamente:
+        Ao colar uma tabela com 7+ colunas, usaremos automaticamente:
         <strong>Coluna 2 = Dependência</strong> e <strong>Coluna 7 = Contatos</strong>.  
         (Se colar só 2 colunas no formato antigo, funciona também.)
       </div>
@@ -346,9 +375,9 @@ document.getElementById('btn-processar').addEventListener('click', ()=>{
     let qtdStr = '';
 
     if (row.length >= 7) {
-      dep = String(row[1]||'').trim(); // 2ª coluna
-      qtdStr = String(row[6]||'').trim(); // 7ª coluna
-      // Ignora cabeçalho quando a 7ª coluna não tem nenhum dígito
+      dep = String(row[1]||'').trim(); // 2ª coluna (index 1)
+      qtdStr = String(row[6]||'').trim(); // 7ª coluna (index 6)
+      // Ignora cabeçalho quando a 7ª coluna não tem dígitos
       if (!/\d/.test(qtdStr)) return;
     } else {
       // fallback formato antigo: Dependência ; Contatos
