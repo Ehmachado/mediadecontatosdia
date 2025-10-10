@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Painéis por Rede — Metas de Contatos</title>
+<!-- SheetJS para XLSX/CSV -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.20.3/dist/xlsx.full.min.js"></script>
+<!-- html2canvas para exportar PNG -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+  :root{
+    --bb-azul:#003399;
+    --bb-amarelo:#FFCC00;
+    --bb-azul-escuro:#001a66;
+    --bg:#0f172a; /* slate-900 */
+    --card:#0b1026; /* fundo cartão */
+    --muted:#94a3b8; /* slate-400 */
+    --border:#1f2a44;
+    --ok:#1b5e20; /* verde */
+    --mid:#f9a825; /* amarelo forte */
+    --warn:#fb8c00; /* laranja */
+    --bad:#c62828; /* vermelho */
+    --chip:#0d1b4d;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family: Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    background: radial-gradient(1200px 800px at 20% -10%, #0b1440 0%, #0a0f2b 40%, #050814 100%);
+    color:#e5e7eb;
+  }
+  header{
+    padding:24px 20px;
+    background: linear-gradient(90deg,var(--bb-azul) 0%, #0a3ab3 40%, #0b1440 100%);
+    border-bottom:1px solid #0d1b4d;
+    position:sticky; top:0; z-index:10;
+  }
+  .brand{
+    display:flex; align-items:center; gap:14px; max-width:1200px; margin:0 auto;
+  }
+  .logo{
+    width:44px; height:44px; border-radius:12px; background:var(--bb-amarelo);
+    box-shadow:0 6px 18px rgba(255,204,0,.3); display:grid; place-items:center; color:#111827; font-weight:900;
+  }
+  h1{margin:0; font-size:20px; letter-spacing:.2px}
+  .sub{font-size:12px; color:#fef3c7}
+  main{max-width:1200px; margin:24px auto; padding:0 20px}
+  .grid{
+    display:grid; gap:16px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width:1000px){
+    .grid{grid-template-columns: 1.2fr 1fr;}
+  }
+  .panel{
+    background: linear-gradient(180deg, rgba(0,17,51,.7), rgba(5,12,34,.9));
+    border:1px solid var(--border); border-radius:20px; padding:16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03);
+  }
+  .panel h2{
+    margin:0 0 10px; font-size:16px; color:#f8fafc; display:flex; align-items:center; gap:8px;
+  }
+  .hint{color:var(--muted); font-size:12px; margin:6px 0 12px}
+  .inputs{display:grid; gap:12px}
+  .row{display:grid; gap:8px}
+  .row.grid2{grid-template-columns: 1fr auto; align-items:center}
+  textarea{
+    width:100%; min-height:120px; padding:12px 12px 40px 12px; resize:vertical;
+    border-radius:12px; border:1px solid var(--border); background:#0a0f26; color:#e5e7eb;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size:12px; line-height:1.4;
+  }
+  .controls{display:flex; flex-wrap:wrap; gap:8px}
+  .btn{
+    appearance:none; border:1px solid #1b2b66; background:linear-gradient(180deg,#0d1b4d,#071033);
+    color:#e6eaf5; padding:10px 14px; border-radius:12px; font-weight:600; cursor:pointer;
+    box-shadow: 0 6px 20px rgba(0,0,0,.25);
+  }
+  .btn:hover{filter:brightness(1.06)}
+  .btn.primary{
+    background:linear-gradient(180deg,var(--bb-amarelo),#f5b500);
+    color:#0b1026; border-color:#e0ac00; text-shadow:0 1px 0 rgba(255,255,255,.5);
+  }
+  .file{
+    display:inline-block; position:relative; overflow:hidden;
+  }
+  .file input[type=file]{position:absolute; inset:0; opacity:0; cursor:pointer}
+  .switch{
+    display:inline-flex; align-items:center; gap:8px; font-size:12px; color:#cbd5e1
+  }
+  .pill{
+    display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
+    background:var(--chip); border:1px solid #11307a; color:#dbeafe; font-size:12px
+  }
+  /* Painéis por Rede */
+  .boards{margin-top:16px; display:grid; gap:16px}
+  .board{
+    border:1px solid #12306b; border-radius:18px; overflow:hidden;
+    background: radial-gradient(800px 400px at 100% -100%, rgba(255,204,0,.15) 0%, rgba(17,24,39,0) 70%), linear-gradient(180deg, #071235, #050b24);
+    box-shadow: 0 14px 40px rgba(0,0,0,.5);
+  }
+  .board-head{
+    display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px;
+    background:linear-gradient(90deg,#021a54, #06286f 60%, #0a1a44); border-bottom:1px solid #0e2a77;
+  }
+  .board-title{
+    display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px;
+  }
+  .tag{background:var(--bb-amarelo); color:#111827; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:800}
+  .board-body{padding:12px 16px 18px}
+  table{width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:12px; background:#060c22}
+  thead th{
+    text-align:left; font-size:12px; color:#bfdbfe; padding:10px; border-bottom:1px solid #0e224f; position:sticky; top:0; background:#071235;
+  }
+  tbody td{
+    padding:10px; font-size:13px; border-bottom:1px dashed #11244f;
+  }
+  tbody tr:hover{background:rgba(255,255,255,.02)}
+  .right{text-align:right}
+  .badge{
+    display:inline-flex; align-items:center; gap:6px; border-radius:999px; padding:6px 10px; font-weight:700; letter-spacing:.2px
+  }
+  .b-ok{background:rgba(27,94,32,.15); color:#9be7a2; border:1px solid rgba(27,94,32,.6)}
+  .b-mid{background:rgba(249,168,37,.12); color:#fde68a; border:1px solid rgba(249,168,37,.6)}
+  .b-warn{background:rgba(251,140,0,.12); color:#ffdb9b; border:1px solid rgba(251,140,0,.55)}
+  .b-bad{background:rgba(198,40,40,.14); color:#fecaca; border:1px solid rgba(198,40,40,.55)}
+  .mini{font-size:11px; color:#9ca3af}
+  .legend{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+  .legend .dot{width:10px; height:10px; border-radius:999px; display:inline-block}
+  .d-ok{background:var(--ok)} .d-mid{background:var(--mid)} .d-warn{background:var(--warn)} .d-bad{background:var(--bad)}
+  .empty{padding:18px; color:#94a3b8; border:1px dashed #1e2a4d; border-radius:12px; background:#060b1f}
+  footer{max-width:1200px; margin:20px auto 60px; padding:0 20px; color:#93c5fd; font-size:12px}
+  .note{opacity:.9}
+  .kbd{font-family:ui-monospace,Menlo,Consolas,monospace; background:#0b122e; border:1px solid #1b2b66; padding:2px 6px; border-radius:6px}
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">BB</div>
+      <div>
+        <h1>Painéis por Rede — Meta de Contatos (10 por Carteira)</h1>
+        <div class="sub">Cole dados ou envie planilhas • Visual moderno • Exportação PNG por Rede</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="grid">
+    <!-- Entrada de dados -->
+    <section class="panel">
+      <h2>1) Carteiras por Agência <span class="pill">Meta = 10 × carteiras</span></h2>
+      <div class="hint">Colunas: <strong>Nome</strong> | <strong>Dependência</strong> | <strong>Carteira</strong>. Nome pode repetir (mais carteiras).</div>
+      <div class="row">
+        <textarea id="tx-carteiras" placeholder="Exemplo:
+Maria Silva;Agência 123;Grupo A
+João Souza;Agência 123;Grupo B
+Maria Silva;Agência 987;Grupo C"></textarea>
+        <div class="controls">
+          <label class="file btn"><input id="file-carteiras" type="file" accept=".xlsx,.csv" />Carregar .xlsx/.csv</label>
+          <label class="switch"><input id="save-carteiras" type="checkbox" /> Salvar/Manter no navegador</label>
+          <button class="btn" id="load-carteiras">Carregar salvo</button>
+          <button class="btn" id="clear-carteiras">Limpar salvo</button>
+        </div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border); margin:16px 0" />
+
+      <h2>2) Contatos do Dia (Realizado)</h2>
+      <div class="hint">Colunas: <strong>Dependência</strong> | <strong>Contatos</strong>.</div>
+      <div class="row">
+        <textarea id="tx-contatos" placeholder="Exemplo:
+Agência 123;28
+Agência 987;12"></textarea>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border); margin:16px 0" />
+
+      <h2>3) Mapeamento de Redes</h2>
+      <div class="hint">Colunas: <strong>Dependência</strong> | <strong>Rede</strong>.</div>
+      <div class="row">
+        <textarea id="tx-redes" placeholder="Exemplo:
+Agência 123;Rede Oeste
+Agência 987;Rede Centro"></textarea>
+        <div class="controls">
+          <label class="file btn"><input id="file-redes" type="file" accept=".xlsx,.csv" />Carregar .xlsx/.csv</label>
+          <label class="switch"><input id="save-redes" type="checkbox" /> Salvar/Manter no navegador</label>
+          <button class="btn" id="load-redes">Carregar salvo</button>
+          <button class="btn" id="clear-redes">Limpar salvo</button>
+        </div>
+      </div>
+
+      <div class="controls" style="margin-top:10px">
+        <button class="btn primary" id="btn-processar">Processar &amp; Gerar Painéis</button>
+        <span class="legend">
+          <span class="mini">Legenda %:</span>
+          <span><span class="dot d-ok"></span> ≥100%</span>
+          <span><span class="dot d-mid"></span> 80–99%</span>
+          <span><span class="dot d-warn"></span> 50–79%</span>
+          <span><span class="dot d-bad"></span> &lt;50%</span>
+        </span>
+      </div>
+    </section>
+
+    <!-- Saída / Painéis -->
+    <section class="panel">
+      <h2>Resultados por Rede</h2>
+      <div class="hint">Serão criados quadros por Rede. Clique para baixar PNGs.</div>
+      <div class="controls" style="margin-bottom:8px">
+        <button class="btn" id="btn-export-all">Exportar PNG de todas as Redes</button>
+      </div>
+      <div id="boards" class="boards">
+        <div class="empty">Nenhum painel ainda. Preencha os dados e clique <span class="kbd">Processar &amp; Gerar Painéis</span>.</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="note">
+      Dica: você pode colar dados separados por <strong>;</strong>, <strong>,</strong> ou <strong>tab</strong>. O leitor também entende .xlsx.
+    </div>
+  </footer>
+
+<script>
+/* ========= Utilidades ========= */
+const LS_KEYS = {
+  carteiras: "bb_carteiras_cache_v1",
+  redes: "bb_redes_cache_v1",
+};
+
+function detectDelimiter(text){
+  // Conta ; , \t
+  const s = (text.match(/;/g)||[]).length;
+  const c = (text.match(/,/g)||[]).length;
+  const t = (text.match(/\t/g)||[]).length;
+  if (t >= s && t >= c) return "\t";
+  if (s >= c && s >= t) return ";";
+  return ",";
+}
+function parseTextTable(text){
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  if (!lines.length) return [];
+  const delim = detectDelimiter(text);
+  return lines.map(l => l.split(delim).map(x => x.trim()));
+}
+function toNumber(x){
+  if (typeof x !== "string") return Number(x)||0;
+  // remove milhar . ou , e troca decimal por .
+  const cleaned = x.replace(/\s/g,'').replace(/\./g,'').replace(',', '.');
+  const n = Number(cleaned);
+  return isNaN(n) ? 0 : n;
+}
+function fmtInt(n){ return (n||0).toLocaleString('pt-BR'); }
+function fmtPct(n){ return (n||0).toLocaleString('pt-BR', {maximumFractionDigits:1}) + "%"; }
+
+function pctBadge(p){
+  if (p >= 100) return ['b-ok','≥100%'];
+  if (p >= 80) return ['b-mid','80–99%'];
+  if (p >= 50) return ['b-warn','50–79%'];
+  return ['b-bad','<50%'];
+}
+
+/* ========= Leitura de arquivos (XLSX/CSV) ========= */
+async function readFileToRows(file){
+  const buf = await file.arrayBuffer();
+  const wb = XLSX.read(buf, {type:'array'});
+  // pega a primeira planilha
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(ws, {header:1, raw:true});
+  // remove linhas vazias finais
+  return rows.filter(r => (r||[]).some(cell => String(cell||'').trim() !== ''));
+}
+
+/* ========= Coleta / Salvamento ========= */
+const txCarteiras = document.getElementById('tx-carteiras');
+const txContatos = document.getElementById('tx-contatos');
+const txRedes = document.getElementById('tx-redes');
+
+document.getElementById('file-carteiras').addEventListener('change', async (e)=>{
+  const f = e.target.files[0]; if(!f) return;
+  const rows = await readFileToRows(f);
+  txCarteiras.value = rows.map(r => (r||[]).slice(0,3).join(';')).join('\n');
+  if (document.getElementById('save-carteiras').checked){
+    localStorage.setItem(LS_KEYS.carteiras, txCarteiras.value);
+  }
+});
+
+document.getElementById('file-redes').addEventListener('change', async (e)=>{
+  const f = e.target.files[0]; if(!f) return;
+  const rows = await readFileToRows(f);
+  txRedes.value = rows.map(r => (r||[]).slice(0,2).join(';')).join('\n');
+  if (document.getElementById('save-redes').checked){
+    localStorage.setItem(LS_KEYS.redes, txRedes.value);
+  }
+});
+
+document.getElementById('load-carteiras').onclick = ()=>{
+  const v = localStorage.getItem(LS_KEYS.carteiras);
+  if (v) txCarteiras.value = v;
+};
+document.getElementById('clear-carteiras').onclick = ()=>{
+  localStorage.removeItem(LS_KEYS.carteiras);
+  alert('Carteiras salvas apagadas do navegador.');
+};
+document.getElementById('load-redes').onclick = ()=>{
+  const v = localStorage.getItem(LS_KEYS.redes);
+  if (v) txRedes.value = v;
+};
+document.getElementById('clear-redes').onclick = ()=>{
+  localStorage.removeItem(LS_KEYS.redes);
+  alert('Redes salvas apagadas do navegador.');
+};
+
+/* ========= Processamento =========
+   Campo 1 -> soma carteiras por Dependência => Meta = 10 * carteiras
+   Campo 2 -> Contatos realizados por Dependência
+   Campo 3 -> Rede por Dependência
+   Resultado: por Rede, lista de Dependências com Meta, Realizado, % e ranking
+=================================== */
+document.getElementById('btn-processar').addEventListener('click', ()=>{
+  // Save if toggled
+  if (document.getElementById('save-carteiras').checked){
+    localStorage.setItem(LS_KEYS.carteiras, txCarteiras.value);
+  }
+  if (document.getElementById('save-redes').checked){
+    localStorage.setItem(LS_KEYS.redes, txRedes.value);
+  }
+
+  const r1 = parseTextTable(txCarteiras.value);
+  const r2 = parseTextTable(txContatos.value);
+  const r3 = parseTextTable(txRedes.value);
+
+  // Normaliza cabeçalhos ausentes: esperamos pelo menos 3 colunas em r1
+  // r1: Nome | Dependência | Carteira
+  // r2: Dependência | Contatos
+  // r3: Dependência | Rede
+
+  // Carteiras por Dependência
+  const carteirasPorDep = {};
+  (r1||[]).forEach(row=>{
+    const dep = String(row[1]||'').trim();
+    if(!dep) return;
+    carteirasPorDep[dep] = (carteirasPorDep[dep]||0) + 1;
+  });
+
+  // Contatos por Dependência
+  const contatosPorDep = {};
+  (r2||[]).forEach(row=>{
+    const dep = String(row[0]||'').trim();
+    const qtd = toNumber(row[1]||0);
+    if(!dep) return;
+    contatosPorDep[dep] = (contatosPorDep[dep]||0) + qtd;
+  });
+
+  // Rede por Dependência
+  const redePorDep = {};
+  (r3||[]).forEach(row=>{
+    const dep = String(row[0]||'').trim();
+    const rede = String(row[1]||'').trim() || 'Sem Rede';
+    if(!dep) return;
+    redePorDep[dep] = rede;
+  });
+
+  // Monta linhas por Dependência
+  const linhas = [];
+  const deps = new Set([...Object.keys(carteirasPorDep), ...Object.keys(contatosPorDep)]);
+  deps.forEach(dep=>{
+    const cart = carteirasPorDep[dep]||0;
+    const meta = cart * 10;
+    const real = contatosPorDep[dep]||0;
+    const pct = meta>0 ? (real/meta)*100 : 0;
+    const rede = redePorDep[dep] || 'Sem Rede';
+    linhas.push({rede, dependencia:dep, carteiras:cart, meta, realizado:real, pct});
+  });
+
+  // Agrupa por rede
+  const porRede = {};
+  linhas.forEach(l=>{
+    if(!porRede[l.rede]) porRede[l.rede]=[];
+    porRede[l.rede].push(l);
+  });
+
+  renderBoards(porRede);
+});
+
+function renderBoards(porRede){
+  const wrap = document.getElementById('boards');
+  wrap.innerHTML = '';
+  const redes = Object.keys(porRede).sort((a,b)=>a.localeCompare(b,'pt-BR',{sensitivity:'base'}));
+  if (!redes.length){
+    wrap.innerHTML = '<div class="empty">Nada para exibir. Verifique os dados.</div>';
+    return;
+  }
+
+  redes.forEach(rede=>{
+    const items = porRede[rede].slice().sort((a,b)=> b.pct - a.pct);
+    const totalMeta = items.reduce((s,i)=>s+i.meta,0);
+    const totalReal = items.reduce((s,i)=>s+i.realizado,0);
+    const pctGeral = totalMeta>0 ? (totalReal/totalMeta)*100 : 0;
+    const [klass,label] = pctBadge(pctGeral);
+
+    const board = document.createElement('div');
+    board.className = 'board';
+    board.dataset.rede = rede;
+
+    const head = document.createElement('div');
+    head.className = 'board-head';
+    head.innerHTML = `
+      <div class="board-title">
+        <span class="tag">${rede}</span>
+        <span class="mini">Agências: ${items.length}</span>
+      </div>
+      <div class="legend">
+        <span class="badge ${klass}">Geral ${fmtPct(pctGeral)}</span>
+        <span class="mini">Meta total: <strong>${fmtInt(totalMeta)}</strong> • Realizado: <strong>${fmtInt(totalReal)}</strong></span>
+        <button class="btn" data-action="export">Exportar PNG</button>
+      </div>
+    `;
+    board.appendChild(head);
+
+    const body = document.createElement('div');
+    body.className = 'board-body';
+
+    // Tabela
+    const tbl = document.createElement('table');
+    const thead = document.createElement('thead');
+    thead.innerHTML = `
+      <tr>
+        <th style="width:40px">#</th>
+        <th>Dependência</th>
+        <th class="right">Carteiras</th>
+        <th class="right">Meta Dia</th>
+        <th class="right">Realizado</th>
+        <th class="right">% Ating.</th>
+      </tr>`;
+    tbl.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    items.forEach((it,idx)=>{
+      const tr = document.createElement('tr');
+      const [k,lbl] = pctBadge(it.pct);
+      tr.innerHTML = `
+        <td>${idx+1}</td>
+        <td>${it.dependencia}</td>
+        <td class="right">${fmtInt(it.carteiras)}</td>
+        <td class="right">${fmtInt(it.meta)}</td>
+        <td class="right">${fmtInt(it.realizado)}</td>
+        <td class="right"><span class="badge ${k}">${fmtPct(it.pct)}</span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    tbl.appendChild(tbody);
+    body.appendChild(tbl);
+    board.appendChild(body);
+
+    // Botão export individual
+    head.querySelector('[data-action="export"]').addEventListener('click', ()=> exportBoardPNG(board, rede));
+
+    wrap.appendChild(board);
+  });
+}
+
+/* ========= Exportação PNG ========= */
+async function exportBoardPNG(boardEl, rede){
+  // dá um pequeno zoom para melhorar nitidez
+  const scale = 2;
+  const canvas = await html2canvas(boardEl, {
+    backgroundColor: null,
+    scale,
+    windowWidth: boardEl.scrollWidth,
+    windowHeight: boardEl.scrollHeight
+  });
+  const link = document.createElement('a');
+  link.download = `rede-${(rede||'painel').replace(/[^\w\-]+/g,'_')}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+document.getElementById('btn-export-all').addEventListener('click', async ()=>{
+  const boards = Array.from(document.querySelectorAll('.board'));
+  if(!boards.length){ alert('Não há painéis para exportar.'); return; }
+  for (const b of boards){
+    await exportBoardPNG(b, b.dataset.rede || 'painel');
+    await new Promise(r=>setTimeout(r,150)); // respiro
+  }
+});
+</script>
+</body>
+</html>
