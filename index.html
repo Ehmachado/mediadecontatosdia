@@ -213,6 +213,9 @@ Maria Silva;Agência 987;Grupo C"></textarea>
         <textarea id="tx-contatos" placeholder="Exemplo com 7 colunas (somente 2 e 7 importam):
 Cód;Agência 123;UF;Tipo;...;...;28
 Cód;Agência 987;UF;Tipo;...;...;12"></textarea>
+        <div class="controls">
+          <button class="btn" id="clear-contatos">Limpar</button>
+        </div>
       </div>
 
       <hr style="border:none;border-top:1px solid var(--border); margin:16px 0" />
@@ -344,6 +347,11 @@ document.getElementById('clear-redes').onclick = ()=>{
   alert('Redes salvas apagadas do navegador.');
 };
 
+/* ========= NOVO: limpar Campo 2 ========= */
+document.getElementById('clear-contatos').onclick = ()=>{
+  txContatos.value = '';
+};
+
 /* ========= Processamento ========= */
 document.getElementById('btn-processar').addEventListener('click', ()=>{
   if (document.getElementById('save-carteiras').checked){
@@ -445,7 +453,7 @@ function renderBoards(porRede){
     const head = document.createElement('div');
     head.className = 'board-head';
     head.innerHTML = `
-      <div class="board-title">${rede}</div>
+      <div class="board-title">Realizado de Contatos Dia - ${rede}</div>
       <div class="board-sub">
         <span class="badge ${klass}">Geral ${fmtPct(pctGeral)}</span>
         <span>Agências: <strong>${items.length}</strong></span>
