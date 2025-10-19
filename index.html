@@ -3,173 +3,536 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Painéis por Rede — Metas de Contatos</title>
-<!-- SheetJS para XLSX/CSV -->
+<title>Super Barreiras — Metas de Contatos</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.20.3/dist/xlsx.full.min.js"></script>
-<!-- html2canvas para exportar PNG -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
   :root{
-    /* Banco do Brasil core */
-    --bb-azul:#0033A0; /* azul BB mais puro */
+    --bb-azul:#0033A0;
     --bb-amarelo:#FFCC00;
     --bb-azul-escuro:#001a66;
-
-    /* Plano de fundo geral */
-    --bg:#0b1026;
-    --border:#1b2b66;
-
-    /* Tabela (linhas alternadas) */
-    --rowA:#ffffff; /* branco */
-    --rowB:#F2F6FF; /* azul clarinho quase branco */
-
-    /* Cores de status (alto contraste p/ % atingimento) */
-    --ok-bg:#2E7D32; /* verde sólido */
-    --ok-fg:#FFFFFF;
-
-    --mid-bg:#F9A825; /* amarelo forte */
-    --mid-fg:#111827;
-
-    --warn-bg:#EF6C00; /* laranja forte */
-    --warn-fg:#FFFFFF;
-
-    --bad-bg:#C62828; /* vermelho forte */
-    --bad-fg:#FFFFFF;
+    --bg:#0a0e1f;
+    --border:#1e2a4d;
+    --panel-bg:rgba(15,23,42,.85);
+    --text-primary:#f8fafc;
+    --text-secondary:#cbd5e1;
   }
 
-  *{box-sizing:border-box}
+  [data-theme="bb-classic"] {
+    --theme-primary:#0033A0;
+    --theme-secondary:#FFCC00;
+    --theme-bg:#ffffff;
+    --theme-text:#0b1026;
+    --theme-header-bg:linear-gradient(135deg, #0033A0 0%, #0052cc 100%);
+    --theme-table-header:#E9F1FF;
+    --theme-row-odd:#ffffff;
+    --theme-row-even:#F2F6FF;
+  }
+  
+  [data-theme="dark-premium"] {
+    --theme-primary:#6366f1;
+    --theme-secondary:#a855f7;
+    --theme-bg:#0f172a;
+    --theme-text:#f1f5f9;
+    --theme-header-bg:linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    --theme-table-header:#1e293b;
+    --theme-row-odd:#1e293b;
+    --theme-row-even:#0f172a;
+  }
+  
+  [data-theme="ocean"] {
+    --theme-primary:#0891b2;
+    --theme-secondary:#06b6d4;
+    --theme-bg:#ecfeff;
+    --theme-text:#164e63;
+    --theme-header-bg:linear-gradient(135deg, #0e7490 0%, #0891b2 100%);
+    --theme-table-header:#cffafe;
+    --theme-row-odd:#ffffff;
+    --theme-row-even:#f0fdfa;
+  }
+  
+  [data-theme="sunset"] {
+    --theme-primary:#dc2626;
+    --theme-secondary:#f97316;
+    --theme-bg:#fff7ed;
+    --theme-text:#7c2d12;
+    --theme-header-bg:linear-gradient(135deg, #dc2626 0%, #f97316 100%);
+    --theme-table-header:#fed7aa;
+    --theme-row-odd:#ffffff;
+    --theme-row-even:#ffedd5;
+  }
+  
+  [data-theme="forest"] {
+    --theme-primary:#059669;
+    --theme-secondary:#10b981;
+    --theme-bg:#f0fdf4;
+    --theme-text:#064e3b;
+    --theme-header-bg:linear-gradient(135deg, #047857 0%, #059669 100%);
+    --theme-table-header:#d1fae5;
+    --theme-row-odd:#ffffff;
+    --theme-row-even:#dcfce7;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  
   body{
-    margin:0;
-    font-family: Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-    background:
-      radial-gradient(1200px 800px at 20% -10%, #0b1440 0%, #0a0f2b 40%, #050814 100%);
-    color:#e5e7eb;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: radial-gradient(ellipse at top, #1e293b 0%, #0f172a 50%, #020617 100%);
+    color:var(--text-primary);
+    min-height:100vh;
+    line-height:1.6;
   }
 
   header{
-    padding:24px 20px;
-    background: linear-gradient(90deg,var(--bb-azul) 0%, #0b3fb8 50%, #0b1440 100%);
-    border-bottom:1px solid #0d1b4d;
-    position:sticky; top:0; z-index:10;
+    padding:32px 24px;
+    background: linear-gradient(135deg, var(--bb-azul) 0%, #0052cc 50%, #1e40af 100%);
+    border-bottom:2px solid rgba(255,204,0,.3);
+    position:sticky; 
+    top:0; 
+    z-index:100;
+    box-shadow: 0 10px 40px rgba(0,0,0,.3);
+    backdrop-filter: blur(12px);
   }
-  .brand{display:flex; align-items:center; gap:14px; max-width:1200px; margin:0 auto;}
+  
+  .brand{
+    display:flex; 
+    align-items:center; 
+    gap:20px; 
+    max-width:1400px; 
+    margin:0 auto;
+  }
+  
   .logo{
-    width:44px; height:44px; border-radius:12px; background:var(--bb-amarelo);
-    box-shadow:0 6px 18px rgba(255,204,0,.35); display:grid; place-items:center; color:#111827; font-weight:900;
+    width:56px; 
+    height:56px; 
+    border-radius:16px; 
+    background:linear-gradient(135deg, var(--bb-amarelo) 0%, #ffd700 100%);
+    box-shadow:0 8px 24px rgba(255,204,0,.4), 0 0 0 4px rgba(255,204,0,.1);
+    display:grid; 
+    place-items:center; 
+    color:#0b1026; 
+    font-weight:900;
+    font-size:24px;
+    letter-spacing:-1px;
   }
-  h1{margin:0; font-size:20px; letter-spacing:.2px}
-  .sub{font-size:12px; color:#FFF2B3}
+  
+  h1{
+    margin:0; 
+    font-size:28px; 
+    letter-spacing:-.5px;
+    font-weight:800;
+    text-shadow: 0 2px 12px rgba(0,0,0,.2);
+  }
+  
+  .sub{
+    font-size:14px; 
+    color:#dbeafe;
+    font-weight:500;
+    margin-top:4px;
+  }
 
-  main{max-width:1200px; margin:24px auto; padding:0 20px}
-  .grid{display:grid; gap:16px; grid-template-columns: 1fr;}
-  @media (min-width:1000px){ .grid{grid-template-columns: 1.2fr 1fr;} }
+  main{
+    max-width:1400px; 
+    margin:40px auto; 
+    padding:0 24px;
+  }
+  
+  .grid{
+    display:grid; 
+    gap:24px; 
+    grid-template-columns: 1fr;
+  }
+  
+  @media (min-width:1100px){ 
+    .grid{grid-template-columns: 1.3fr 1fr;} 
+  }
 
   .panel{
-    background: linear-gradient(180deg, rgba(0,17,51,.6), rgba(5,12,34,.9));
-    border:1px solid var(--border); border-radius:20px; padding:16px;
-    box-shadow: 0 10px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03);
+    background: linear-gradient(135deg, rgba(30,41,59,.95) 0%, rgba(15,23,42,.95) 100%);
+    border:1px solid rgba(148,163,184,.2); 
+    border-radius:24px; 
+    padding:28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.4), 
+                inset 0 1px 0 rgba(255,255,255,.05),
+                0 0 0 1px rgba(255,255,255,.02);
+    backdrop-filter: blur(20px);
   }
-  .panel h2{margin:0 0 10px; font-size:16px; color:#f8fafc; display:flex; align-items:center; gap:8px;}
-  .hint{color:#cdd6ea; font-size:12px; margin:6px 0 12px}
-  .row{display:grid; gap:8px}
+  
+  .panel h2{
+    margin:0 0 8px; 
+    font-size:18px; 
+    color:var(--text-primary); 
+    display:flex; 
+    align-items:center; 
+    gap:12px;
+    font-weight:700;
+    letter-spacing:-.3px;
+  }
+  
+  .hint{
+    color:var(--text-secondary); 
+    font-size:13px; 
+    margin:0 0 16px;
+    line-height:1.5;
+  }
+  
+  .row{display:grid; gap:12px}
+  
   textarea{
-    width:100%; min-height:120px; padding:12px 12px 40px 12px; resize:vertical;
-    border-radius:12px; border:1px solid #203377; background:#0a1130; color:#eef2ff;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-    font-size:12px; line-height:1.4;
+    width:100%; 
+    min-height:140px; 
+    padding:16px; 
+    resize:vertical;
+    border-radius:16px; 
+    border:2px solid rgba(148,163,184,.2); 
+    background:rgba(15,23,42,.6); 
+    color:#e2e8f0;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+    font-size:13px; 
+    line-height:1.6;
+    transition: all .2s;
   }
-  .controls{display:flex; flex-wrap:wrap; gap:8px}
+  
+  textarea:focus{
+    outline:none;
+    border-color:var(--bb-amarelo);
+    box-shadow: 0 0 0 3px rgba(255,204,0,.1);
+  }
+  
+  .controls{
+    display:flex; 
+    flex-wrap:wrap; 
+    gap:10px;
+    align-items:center;
+  }
+  
   .btn{
-    appearance:none; border:1px solid #1b2b66; background:linear-gradient(180deg,#0d1b4d,#071033);
-    color:#e6eaf5; padding:10px 14px; border-radius:12px; font-weight:600; cursor:pointer;
-    box-shadow: 0 6px 20px rgba(0,0,0,.25);
+    appearance:none; 
+    border:1px solid rgba(148,163,184,.2); 
+    background:linear-gradient(135deg, rgba(51,65,85,.8), rgba(30,41,59,.8));
+    color:#f1f5f9; 
+    padding:12px 20px; 
+    border-radius:12px; 
+    font-weight:600; 
+    cursor:pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,.2);
+    transition: all .2s;
+    font-size:14px;
   }
-  .btn:hover{filter:brightness(1.06)}
+  
+  .btn:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,.3);
+    border-color:rgba(148,163,184,.4);
+  }
+  
   .btn.primary{
-    background:linear-gradient(180deg,var(--bb-amarelo),#f2b903);
-    color:#0b1026; border-color:#e0ac00; text-shadow:0 1px 0 rgba(255,255,255,.45);
+    background:linear-gradient(135deg, var(--bb-amarelo), #ffd700);
+    color:#0b1026; 
+    border:none;
+    text-shadow:0 1px 0 rgba(255,255,255,.3);
+    font-weight:700;
   }
-  .file{display:inline-block; position:relative; overflow:hidden;}
-  .file input[type=file]{position:absolute; inset:0; opacity:0; cursor:pointer}
+  
+  .btn.primary:hover{
+    background:linear-gradient(135deg, #ffd700, var(--bb-amarelo));
+  }
+  
+  .file{
+    display:inline-block; 
+    position:relative; 
+    overflow:hidden;
+  }
+  
+  .file input[type=file]{
+    position:absolute; 
+    inset:0; 
+    opacity:0; 
+    cursor:pointer;
+  }
+  
   .pill{
-    display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
-    background:#0d1b4d; border:1px solid #12307a; color:#dbeafe; font-size:12px
-  }
-
-  /* ======== Painéis por Rede ======== */
-  .boards{margin-top:16px; display:grid; gap:16px}
-  .board{
-    border:1px solid #12306b; border-radius:18px; overflow:hidden;
-    background:
-      radial-gradient(900px 420px at 100% -100%, rgba(255,204,0,.18) 0%, rgba(17,24,39,0) 70%),
-      linear-gradient(180deg, #061647, #051133);
-    box-shadow: 0 14px 40px rgba(0,0,0,.5);
-  }
-  .board-head{
-    display:block; padding:14px 16px;
-    background:linear-gradient(90deg,#012468, #05328e 60%, #062460);
-    border-bottom:1px solid #0e2a77;
-  }
-  /* Título centralizado ocupando metade do painel */
-  .board-title{
-    width:50%;
-    margin:0 auto;
-    text-align:center;
-    color:#111827;
-    background:linear-gradient(180deg,var(--bb-amarelo),#f2b903);
-    padding:10px 14px;
+    display:inline-flex; 
+    align-items:center; 
+    gap:8px; 
+    padding:8px 16px; 
     border-radius:999px;
-    font-weight:900;
-    letter-spacing:.2px;
-    font-size:19px;
-    box-shadow: 0 6px 18px rgba(255,204,0,.35);
-  }
-  .board-sub{
-    margin-top:8px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap; color:#EAF1FF; font-size:12px;
-  }
-
-  /* Badges de % com SÓLIDOS e contraste alto */
-  .badge{
-    display:inline-flex; align-items:center; gap:6px;
-    border-radius:999px; padding:6px 11px; font-weight:800; letter-spacing:.2px;
-    box-shadow: 0 1px 0 rgba(255,255,255,.15), 0 6px 16px rgba(0,0,0,.25);
+    background:rgba(59,130,246,.15); 
+    border:1px solid rgba(59,130,246,.3); 
+    color:#93c5fd; 
     font-size:13px;
+    font-weight:600;
   }
-  .b-ok { background:var(--ok-bg); color:var(--ok-fg); border:1px solid rgba(0,0,0,.15); }
-  .b-mid { background:var(--mid-bg); color:var(--mid-fg); border:1px solid rgba(0,0,0,.15); }
-  .b-warn{ background:var(--warn-bg); color:var(--warn-fg); border:1px solid rgba(0,0,0,.15); }
-  .b-bad { background:var(--bad-bg); color:var(--bad-fg); border:1px solid rgba(0,0,0,.15); }
 
-  .board-body{padding:12px 16px 8px}
+  .theme-selector{
+    margin-top:16px;
+    padding:20px;
+    background:rgba(30,41,59,.5);
+    border-radius:16px;
+    border:1px solid rgba(148,163,184,.15);
+  }
+  
+  .theme-selector h3{
+    font-size:15px;
+    margin-bottom:12px;
+    color:var(--text-primary);
+    font-weight:700;
+  }
+  
+  .theme-options{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap:10px;
+  }
+  
+  .theme-btn{
+    padding:12px;
+    border-radius:12px;
+    border:2px solid transparent;
+    cursor:pointer;
+    transition:all .2s;
+    text-align:center;
+    font-size:13px;
+    font-weight:600;
+  }
+  
+  .theme-btn.active{
+    border-color:var(--bb-amarelo);
+    box-shadow: 0 0 0 3px rgba(255,204,0,.2);
+  }
+  
+  .theme-btn:hover{
+    transform:scale(1.05);
+  }
+  
+  .theme-btn[data-theme="bb-classic"]{
+    background:linear-gradient(135deg, #0033A0, #0052cc);
+    color:#fff;
+  }
+  
+  .theme-btn[data-theme="dark-premium"]{
+    background:linear-gradient(135deg, #6366f1, #a855f7);
+    color:#fff;
+  }
+  
+  .theme-btn[data-theme="ocean"]{
+    background:linear-gradient(135deg, #0891b2, #06b6d4);
+    color:#fff;
+  }
+  
+  .theme-btn[data-theme="sunset"]{
+    background:linear-gradient(135deg, #dc2626, #f97316);
+    color:#fff;
+  }
+  
+  .theme-btn[data-theme="forest"]{
+    background:linear-gradient(135deg, #059669, #10b981);
+    color:#fff;
+  }
 
-  table{width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:12px;}
+  .boards{margin-top:24px; display:grid; gap:24px}
+  
+  .board{
+    border:2px solid rgba(148,163,184,.15); 
+    border-radius:24px; 
+    overflow:hidden;
+    background:var(--theme-bg);
+    box-shadow: 0 20px 60px rgba(0,0,0,.4);
+    transition: transform .3s;
+  }
+  
+  .board:hover{
+    transform: translateY(-4px);
+  }
+
+  .board-export-content{
+    border-radius:24px;
+    overflow:hidden;
+  }
+  
+  .board-head{
+    padding:24px;
+    background:var(--theme-header-bg);
+    border-bottom:2px solid rgba(0,0,0,.1);
+  }
+  
+  .board-title-wrapper{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    padding:16px 28px;
+    border-radius:999px;
+    background:rgba(0,0,0,.2);
+    backdrop-filter: blur(10px);
+    border:2px solid rgba(255,255,255,.1);
+    box-shadow: 0 8px 24px rgba(0,0,0,.3);
+  }
+
+  .board-logo{
+    width:36px;
+    height:36px;
+    object-fit:contain;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,.3));
+  }
+
+  .board-title-text{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+  }
+
+  .board-super{
+    font-size:12px;
+    font-weight:600;
+    color:rgba(255,255,255,.8);
+    letter-spacing:.5px;
+    text-transform:uppercase;
+  }
+
+  .board-rede{
+    font-size:22px;
+    font-weight:900;
+    color:#fff;
+    letter-spacing:-.3px;
+  }
+  
+  .board-sub{
+    margin-top:16px; 
+    display:flex; 
+    justify-content:center; 
+    gap:16px; 
+    flex-wrap:wrap; 
+    color:rgba(255,255,255,.95); 
+    font-size:14px;
+    font-weight:500;
+  }
+
+  .badge{
+    display:inline-flex; 
+    align-items:center; 
+    gap:8px;
+    border-radius:999px; 
+    padding:8px 16px; 
+    font-weight:800; 
+    letter-spacing:.3px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.2);
+    font-size:14px;
+  }
+  
+  .b-ok { 
+    background:#2E7D32; 
+    color:#fff; 
+  }
+  
+  .b-mid { 
+    background:#F9A825; 
+    color:#111827; 
+  }
+  
+  .b-warn{ 
+    background:#EF6C00; 
+    color:#fff; 
+  }
+  
+  .b-bad { 
+    background:#C62828; 
+    color:#fff; 
+  }
+
+  .board-body{padding:20px 24px}
+
+  table{
+    width:100%; 
+    border-collapse:separate; 
+    border-spacing:0; 
+    overflow:hidden; 
+    border-radius:16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.1);
+  }
+  
   thead th{
-    text-align:left; font-size:12px;
-    color:#0033A0; padding:10px;
-    background:#E9F1FF; /* cabeçalho claro azulado */
-    border-bottom:2px solid #C7D9FF;
-    position:sticky; top:0; z-index:1;
+    text-align:left; 
+    font-size:13px;
+    color:var(--theme-text); 
+    padding:14px 12px;
+    background:var(--theme-table-header); 
+    border-bottom:2px solid rgba(0,0,0,.1);
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.5px;
   }
+  
   tbody td{
-    padding:10px; font-size:13px; border-bottom:1px dashed #C7D9FF; color:#0b1026;
+    padding:14px 12px; 
+    font-size:14px; 
+    border-bottom:1px solid rgba(0,0,0,.05); 
+    color:var(--theme-text);
   }
-  /* Linhas alternadas: branco e azul clarinho */
-  tbody tr:nth-child(odd){ background:var(--rowA); }
-  tbody tr:nth-child(even){ background:var(--rowB); }
-  tbody tr:hover{outline:2px solid #B3CBFF; filter:brightness(1.01)}
+  
+  tbody tr:nth-child(odd){ 
+    background:var(--theme-row-odd); 
+  }
+  
+  tbody tr:nth-child(even){ 
+    background:var(--theme-row-even); 
+  }
+  
+  tbody tr:hover{
+    background:rgba(59,130,246,.08);
+    transform:scale(1.01);
+  }
+  
   .right{text-align:right}
 
   .board-foot{
-    display:flex; justify-content:flex-end; gap:8px;
-    padding:10px 16px 14px; border-top:1px solid #0e2a77;
-    background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
+    display:flex; 
+    justify-content:flex-end; 
+    gap:12px;
+    padding:20px 24px;
+    background:rgba(0,0,0,.05);
   }
 
   .empty{
-    padding:18px; color:#94a3b8; border:1px dashed #1e2a4d; border-radius:12px; background:#060b1f
+    padding:40px; 
+    color:#94a3b8; 
+    border:2px dashed rgba(148,163,184,.2); 
+    border-radius:16px; 
+    background:rgba(15,23,42,.3);
+    text-align:center;
+    font-size:15px;
   }
-  footer{max-width:1200px; margin:20px auto 60px; padding:0 20px; color:#93c5fd; font-size:12px}
-  .kbd{font-family:ui-monospace,Menlo,Consolas,monospace; background:#0b122e; border:1px solid #1b2b66; padding:2px 6px; border-radius:6px}
+  
+  footer{
+    max-width:1400px; 
+    margin:40px auto 80px; 
+    padding:0 24px; 
+    color:#94a3b8; 
+    font-size:13px;
+    text-align:center;
+  }
+
+  hr{
+    border:none;
+    border-top:1px solid rgba(148,163,184,.2); 
+    margin:24px 0;
+  }
+
+  label.controls{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:var(--text-secondary);
+    font-size:14px;
+    cursor:pointer;
+  }
+
+  input[type="checkbox"]{
+    width:18px;
+    height:18px;
+    cursor:pointer;
+  }
 </style>
 </head>
 <body>
@@ -177,91 +540,88 @@
     <div class="brand">
       <div class="logo">BB</div>
       <div>
-        <h1>Painéis por Rede — Meta de Contatos (10 por Carteira)</h1>
-        <div class="sub">Cole dados ou envie planilhas • Visual moderno • Exportação PNG por Rede</div>
+        <h1>Painéis por Rede — Meta de Contatos</h1>
+        <div class="sub">Sistema inteligente de visualização e exportação</div>
       </div>
     </div>
   </header>
 
   <main class="grid">
-    <!-- Entrada de dados -->
     <section class="panel">
-      <h2>1) Carteiras por Agência <span class="pill">Meta = 10 × carteiras</span></h2>
-      <div class="hint">Colunas: <strong>Nome</strong> | <strong>Dependência</strong> | <strong>Carteira</strong>. Nome pode repetir (mais carteiras).</div>
+      <h2>📊 Carteiras por Agência <span class="pill">Meta = 10 × carteiras</span></h2>
+      <div class="hint">Colunas: <strong>Nome | Dependência | Carteira</strong></div>
       <div class="row">
-        <textarea id="tx-carteiras" placeholder="Exemplo:
-Maria Silva;Agência 123;Grupo A
-João Souza;Agência 123;Grupo B
-Maria Silva;Agência 987;Grupo C"></textarea>
+        <textarea id="tx-carteiras" placeholder="Maria Silva;Agência 123;Grupo A&#10;João Souza;Agência 123;Grupo B"></textarea>
         <div class="controls">
-          <label class="file btn"><input id="file-carteiras" type="file" accept=".xlsx,.csv" />Carregar .xlsx/.csv</label>
-          <label class="controls"><input id="save-carteiras" type="checkbox" /> Salvar/Manter no navegador</label>
+          <label class="file btn"><input id="file-carteiras" type="file" accept=".xlsx,.csv" />📁 Carregar arquivo</label>
+          <label class="controls"><input id="save-carteiras" type="checkbox" /> Salvar</label>
           <button class="btn" id="load-carteiras">Carregar salvo</button>
-          <button class="btn" id="clear-carteiras">Limpar salvo</button>
+          <button class="btn" id="clear-carteiras">Limpar</button>
         </div>
       </div>
 
-      <hr style="border:none;border-top:1px solid var(--border); margin:16px 0" />
+      <hr/>
 
-      <h2>2) Contatos do Dia (Realizado) — Cole 7 colunas</h2>
-      <div class="hint">
-        Ao colar uma tabela com 7+ colunas, usaremos automaticamente:
-        <strong>Coluna 2 = Dependência</strong> e <strong>Coluna 7 = Contatos</strong>.  
-        (Se colar só 2 colunas no formato antigo, funciona também.)
-      </div>
+      <h2>✅ Contatos do Dia (Realizado)</h2>
+      <div class="hint">7 colunas: usa coluna 2 (Dependência) e 7 (Contatos) | ou 2 colunas simples</div>
       <div class="row">
-        <textarea id="tx-contatos" placeholder="Exemplo com 7 colunas (somente 2 e 7 importam):
-Cód;Agência 123;UF;Tipo;...;...;28
-Cód;Agência 987;UF;Tipo;...;...;12"></textarea>
+        <textarea id="tx-contatos" placeholder="Cód;Agência 123;UF;Tipo;...;...;28"></textarea>
         <div class="controls">
           <button class="btn" id="clear-contatos">Limpar</button>
         </div>
       </div>
 
-      <hr style="border:none;border-top:1px solid var(--border); margin:16px 0" />
+      <hr/>
 
-      <h2>3) Mapeamento de Redes</h2>
-      <div class="hint">Colunas: <strong>Dependência</strong> | <strong>Rede</strong>.</div>
+      <h2>🌐 Mapeamento de Redes</h2>
+      <div class="hint">Colunas: <strong>Dependência | Rede</strong></div>
       <div class="row">
-        <textarea id="tx-redes" placeholder="Exemplo:
-Agência 123;Rede Oeste
-Agência 987;Rede Centro"></textarea>
+        <textarea id="tx-redes" placeholder="Agência 123;Rede Oeste&#10;Agência 987;Rede Centro"></textarea>
         <div class="controls">
-          <label class="file btn"><input id="file-redes" type="file" accept=".xlsx,.csv" />Carregar .xlsx/.csv</label>
-          <label class="controls"><input id="save-redes" type="checkbox" /> Salvar/Manter no navegador</label>
+          <label class="file btn"><input id="file-redes" type="file" accept=".xlsx,.csv" />📁 Carregar arquivo</label>
+          <label class="controls"><input id="save-redes" type="checkbox" /> Salvar</label>
           <button class="btn" id="load-redes">Carregar salvo</button>
-          <button class="btn" id="clear-redes">Limpar salvo</button>
+          <button class="btn" id="clear-redes">Limpar</button>
         </div>
       </div>
 
-      <div class="controls" style="margin-top:10px">
-        <button class="btn primary" id="btn-processar">Processar &amp; Gerar Painéis</button>
-        <span style="font-size:12px; color:#cde1ff">Exportação por rede aparece no rodapé de cada painel.</span>
+      <div class="theme-selector">
+        <h3>🎨 Tema dos Painéis</h3>
+        <div class="theme-options">
+          <div class="theme-btn active" data-theme="bb-classic">BB Classic</div>
+          <div class="theme-btn" data-theme="dark-premium">Dark Premium</div>
+          <div class="theme-btn" data-theme="ocean">Ocean</div>
+          <div class="theme-btn" data-theme="sunset">Sunset</div>
+          <div class="theme-btn" data-theme="forest">Forest</div>
+        </div>
+      </div>
+
+      <div class="controls" style="margin-top:24px">
+        <button class="btn primary" id="btn-processar">⚡ Processar & Gerar Painéis</button>
       </div>
     </section>
 
-    <!-- Saída / Painéis -->
     <section class="panel">
-      <h2>Resultados por Rede</h2>
-      <div class="hint">Serão criados quadros por Rede. Clique para baixar PNGs no rodapé de cada painel.</div>
-      <div class="controls" style="margin-bottom:8px">
-        <button class="btn" id="btn-export-all">Exportar PNG de todas as Redes</button>
+      <h2>📈 Resultados por Rede</h2>
+      <div class="controls" style="margin-bottom:16px">
+        <button class="btn primary" id="btn-export-all">💾 Exportar Todas (PNG)</button>
       </div>
       <div id="boards" class="boards">
-        <div class="empty">Nenhum painel ainda. Preencha os dados e clique <span class="kbd">Processar &amp; Gerar Painéis</span>.</div>
+        <div class="empty">Aguardando dados... Preencha os campos e clique em Processar</div>
       </div>
     </section>
   </main>
 
   <footer>
-    <div>Você pode colar dados separados por <strong>;</strong>, <strong>,</strong> ou <strong>tab</strong>. O leitor também entende .xlsx (Campos 1 e 3).</div>
+    Desenvolvido para Banco do Brasil • Aceita delimitadores: <strong>;</strong> <strong>,</strong> ou <strong>tab</strong>
   </footer>
 
 <script>
-/* ========= Utilidades ========= */
+let currentTheme = 'bb-classic';
+
 const LS_KEYS = {
-  carteiras: "bb_carteiras_cache_v1",
-  redes: "bb_redes_cache_v1",
+  carteiras: "bb_carteiras_v2",
+  redes: "bb_redes_v2",
 };
 
 function detectDelimiter(text){
@@ -269,25 +629,29 @@ function detectDelimiter(text){
   const c = (text.match(/,/g)||[]).length;
   const t = (text.match(/\t/g)||[]).length;
   if (t >= s && t >= c) return "\\t";
-  if (s >= c && s >= t) return ";";
+  if (s >= c) return ";";
   return ",";
 }
+
 function splitByDelim(line, delim){
   if (delim === "\\t") return line.split(/\t/).map(x=>x.trim());
   return line.split(delim).map(x=>x.trim());
 }
+
 function parseTextTable(text){
   const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
   if (!lines.length) return [];
   const delim = detectDelimiter(text);
   return lines.map(l => splitByDelim(l, delim));
 }
+
 function toNumber(x){
   if (typeof x !== "string") return Number(x)||0;
   const cleaned = x.replace(/\s/g,'').replace(/\./g,'').replace(',', '.');
   const n = Number(cleaned);
   return isNaN(n) ? 0 : n;
 }
+
 function fmtInt(n){ return (n||0).toLocaleString('pt-BR'); }
 function fmtPct(n){ return (n||0).toLocaleString('pt-BR', {maximumFractionDigits:1}) + "%"; }
 
@@ -298,7 +662,6 @@ function pctBadge(p){
   return ['b-bad','<50%'];
 }
 
-/* ========= Leitura de arquivos (XLSX/CSV) ========= */
 async function readFileToRows(file){
   const buf = await file.arrayBuffer();
   const wb = XLSX.read(buf, {type:'array'});
@@ -307,7 +670,6 @@ async function readFileToRows(file){
   return rows.filter(r => (r||[]).some(cell => String(cell||'').trim() !== ''));
 }
 
-/* ========= Coleta / Salvamento ========= */
 const txCarteiras = document.getElementById('tx-carteiras');
 const txContatos = document.getElementById('tx-contatos');
 const txRedes = document.getElementById('tx-redes');
@@ -334,25 +696,34 @@ document.getElementById('load-carteiras').onclick = ()=>{
   const v = localStorage.getItem(LS_KEYS.carteiras);
   if (v) txCarteiras.value = v;
 };
+
 document.getElementById('clear-carteiras').onclick = ()=>{
   localStorage.removeItem(LS_KEYS.carteiras);
-  alert('Carteiras salvas apagadas do navegador.');
+  alert('✓ Carteiras apagadas');
 };
+
 document.getElementById('load-redes').onclick = ()=>{
   const v = localStorage.getItem(LS_KEYS.redes);
   if (v) txRedes.value = v;
 };
+
 document.getElementById('clear-redes').onclick = ()=>{
   localStorage.removeItem(LS_KEYS.redes);
-  alert('Redes salvas apagadas do navegador.');
+  alert('✓ Redes apagadas');
 };
 
-/* ========= NOVO: limpar Campo 2 ========= */
 document.getElementById('clear-contatos').onclick = ()=>{
   txContatos.value = '';
 };
 
-/* ========= Processamento ========= */
+document.querySelectorAll('.theme-btn').forEach(btn => {
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTheme = btn.dataset.theme;
+  });
+});
+
 document.getElementById('btn-processar').addEventListener('click', ()=>{
   if (document.getElementById('save-carteiras').checked){
     localStorage.setItem(LS_KEYS.carteiras, txCarteiras.value);
@@ -365,7 +736,6 @@ document.getElementById('btn-processar').addEventListener('click', ()=>{
   const r2 = parseTextTable(txContatos.value);
   const r3 = parseTextTable(txRedes.value);
 
-  /* Campo 1: Nome | Dependência | Carteira (conta carteiras por Dependência) */
   const carteirasPorDep = {};
   (r1||[]).forEach(row=>{
     const dep = String(row[1]||'').trim();
@@ -373,22 +743,17 @@ document.getElementById('btn-processar').addEventListener('click', ()=>{
     carteirasPorDep[dep] = (carteirasPorDep[dep]||0) + 1;
   });
 
-  /* Campo 2: 7 colunas -> usa col[1] como Dependência e col[6] como Contatos
-     Fallback: se vier só 2 colunas (Dependência;Contatos), também funciona. */
   const contatosPorDep = {};
   (r2||[]).forEach(row=>{
     if (!row || !row.length) return;
-
     let dep = '';
     let qtdStr = '';
 
     if (row.length >= 7) {
-      dep = String(row[1]||'').trim(); // 2ª coluna (index 1)
-      qtdStr = String(row[6]||'').trim(); // 7ª coluna (index 6)
-      // Ignora cabeçalho quando a 7ª coluna não tem dígitos
+      dep = String(row[1]||'').trim();
+      qtdStr = String(row[6]||'').trim();
       if (!/\d/.test(qtdStr)) return;
     } else {
-      // fallback formato antigo: Dependência ; Contatos
       dep = String(row[0]||'').trim();
       qtdStr = String(row[1]||'').trim();
       if (!/\d/.test(qtdStr)) return;
@@ -399,7 +764,6 @@ document.getElementById('btn-processar').addEventListener('click', ()=>{
     contatosPorDep[dep] = (contatosPorDep[dep]||0) + qtd;
   });
 
-  /* Campo 3: Dependência | Rede */
   const redePorDep = {};
   (r3||[]).forEach(row=>{
     const dep = String(row[0]||'').trim();
@@ -408,7 +772,6 @@ document.getElementById('btn-processar').addEventListener('click', ()=>{
     redePorDep[dep] = rede;
   });
 
-  /* Montagem das linhas por dependência */
   const linhas = [];
   const deps = new Set([...Object.keys(carteirasPorDep), ...Object.keys(contatosPorDep)]);
   deps.forEach(dep=>{
@@ -420,7 +783,6 @@ document.getElementById('btn-processar').addEventListener('click', ()=>{
     linhas.push({rede, dependencia:dep, carteiras:cart, meta, realizado:real, pct});
   });
 
-  /* Agrupa por rede e renderiza */
   const porRede = {};
   linhas.forEach(l=>{
     if(!porRede[l.rede]) porRede[l.rede]=[];
@@ -434,8 +796,9 @@ function renderBoards(porRede){
   const wrap = document.getElementById('boards');
   wrap.innerHTML = '';
   const redes = Object.keys(porRede).sort((a,b)=>a.localeCompare(b,'pt-BR',{sensitivity:'base'}));
+  
   if (!redes.length){
-    wrap.innerHTML = '<div class="empty">Nada para exibir. Verifique os dados.</div>';
+    wrap.innerHTML = '<div class="empty">Nenhum dado processado. Verifique as entradas.</div>';
     return;
   }
 
@@ -449,19 +812,29 @@ function renderBoards(porRede){
     const board = document.createElement('div');
     board.className = 'board';
     board.dataset.rede = rede;
+    board.dataset.theme = currentTheme;
+
+    const exportContent = document.createElement('div');
+    exportContent.className = 'board-export-content';
 
     const head = document.createElement('div');
     head.className = 'board-head';
     head.innerHTML = `
-      <div class="board-title">Realizado de Contatos Dia - ${rede}</div>
+      <div class="board-title-wrapper">
+        <img src="logo.png" alt="Logo" class="board-logo" onerror="this.style.display='none'">
+        <div class="board-title-text">
+          <div class="board-super">Super Barreiras</div>
+          <div class="board-rede">${rede}</div>
+        </div>
+      </div>
       <div class="board-sub">
-        <span class="badge ${klass}">Geral ${fmtPct(pctGeral)}</span>
+        <span class="badge ${klass}">${fmtPct(pctGeral)}</span>
         <span>Agências: <strong>${items.length}</strong></span>
-        <span>Meta total: <strong>${fmtInt(totalMeta)}</strong></span>
+        <span>Meta: <strong>${fmtInt(totalMeta)}</strong></span>
         <span>Realizado: <strong>${fmtInt(totalReal)}</strong></span>
       </div>
     `;
-    board.appendChild(head);
+    exportContent.appendChild(head);
 
     const body = document.createElement('div');
     body.className = 'board-body';
@@ -470,22 +843,20 @@ function renderBoards(porRede){
     const thead = document.createElement('thead');
     thead.innerHTML = `
       <tr>
-        <th style="width:40px">#</th>
         <th>Dependência</th>
         <th class="right">Carteiras</th>
-        <th class="right">Meta Dia</th>
+        <th class="right">Meta</th>
         <th class="right">Realizado</th>
         <th class="right">% Ating.</th>
       </tr>`;
     tbl.appendChild(thead);
 
     const tbody = document.createElement('tbody');
-    items.forEach((it,idx)=>{
+    items.forEach((it)=>{
       const tr = document.createElement('tr');
       const [k] = pctBadge(it.pct);
       tr.innerHTML = `
-        <td>${idx+1}</td>
-        <td>${it.dependencia}</td>
+        <td><strong>${it.dependencia}</strong></td>
         <td class="right">${fmtInt(it.carteiras)}</td>
         <td class="right">${fmtInt(it.meta)}</td>
         <td class="right">${fmtInt(it.realizado)}</td>
@@ -495,15 +866,16 @@ function renderBoards(porRede){
     });
     tbl.appendChild(tbody);
     body.appendChild(tbl);
-    board.appendChild(body);
+    exportContent.appendChild(body);
+    
+    board.appendChild(exportContent);
 
-    /* Rodapé com Exportar (fora do título) */
     const foot = document.createElement('div');
     foot.className = 'board-foot';
     const btn = document.createElement('button');
     btn.className = 'btn';
-    btn.textContent = 'Exportar PNG';
-    btn.addEventListener('click', ()=> exportBoardPNG(board, rede));
+    btn.innerHTML = '💾 Exportar PNG';
+    btn.addEventListener('click', ()=> exportBoardPNG(exportContent, rede));
     foot.appendChild(btn);
     board.appendChild(foot);
 
@@ -511,28 +883,41 @@ function renderBoards(porRede){
   });
 }
 
-/* ========= Exportação PNG ========= */
-async function exportBoardPNG(boardEl, rede){
-  const scale = 2;
-  const canvas = await html2canvas(boardEl, {
-    backgroundColor: null,
+async function exportBoardPNG(contentEl, rede){
+  const scale = 3;
+  const canvas = await html2canvas(contentEl, {
+    backgroundColor: '#ffffff',
     scale,
-    windowWidth: boardEl.scrollWidth,
-    windowHeight: boardEl.scrollHeight
+    windowWidth: contentEl.scrollWidth,
+    windowHeight: contentEl.scrollHeight,
+    logging: false,
+    useCORS: true,
+    x: 0,
+    y: 0,
+    scrollX: 0,
+    scrollY: 0
   });
+  
   const link = document.createElement('a');
-  link.download = `rede-${(rede||'painel').replace(/[^\w\-]+/g,'_')}.png`;
+  link.download = `painel-${(rede||'rede').replace(/[^\w\-]+/g,'_')}.png`;
   link.href = canvas.toDataURL('image/png');
   link.click();
 }
 
 document.getElementById('btn-export-all').addEventListener('click', async ()=>{
-  const boards = Array.from(document.querySelectorAll('.board'));
-  if(!boards.length){ alert('Não há painéis para exportar.'); return; }
-  for (const b of boards){
-    await exportBoardPNG(b, b.dataset.rede || 'painel');
-    await new Promise(r=>setTimeout(r,120));
+  const contents = Array.from(document.querySelectorAll('.board-export-content'));
+  if(!contents.length){ 
+    alert('⚠️ Nenhum painel para exportar'); 
+    return; 
   }
+  
+  for (let i = 0; i < contents.length; i++){
+    const board = contents[i].closest('.board');
+    await exportBoardPNG(contents[i], board.dataset.rede || 'painel');
+    await new Promise(r=>setTimeout(r,200));
+  }
+  
+  alert(`✓ ${contents.length} painéis exportados com sucesso!`);
 });
 </script>
 </body>
