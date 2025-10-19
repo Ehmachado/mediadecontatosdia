@@ -346,8 +346,9 @@
   }
 
   .board-export-content{
-    border-radius:24px;
+    border-radius:0;
     overflow:hidden;
+    background:var(--theme-bg);
   }
   
   .board-head{
@@ -360,8 +361,8 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:12px;
-    padding:16px 28px;
+    gap:16px;
+    padding:20px 36px;
     border-radius:999px;
     background:rgba(0,0,0,.2);
     backdrop-filter: blur(10px);
@@ -370,8 +371,8 @@
   }
 
   .board-logo{
-    width:36px;
-    height:36px;
+    width:47px;
+    height:47px;
     object-fit:contain;
     filter: drop-shadow(0 2px 8px rgba(0,0,0,.3));
   }
@@ -384,41 +385,41 @@
   }
 
   .board-super{
-    font-size:12px;
+    font-size:16px;
     font-weight:600;
     color:rgba(255,255,255,.8);
-    letter-spacing:.5px;
+    letter-spacing:.6px;
     text-transform:uppercase;
   }
 
   .board-rede{
-    font-size:22px;
+    font-size:29px;
     font-weight:900;
     color:#fff;
-    letter-spacing:-.3px;
+    letter-spacing:-.4px;
   }
   
   .board-sub{
-    margin-top:16px; 
+    margin-top:20px; 
     display:flex; 
     justify-content:center; 
-    gap:16px; 
+    gap:20px; 
     flex-wrap:wrap; 
     color:rgba(255,255,255,.95); 
-    font-size:14px;
+    font-size:18px;
     font-weight:500;
   }
 
   .badge{
     display:inline-flex; 
     align-items:center; 
-    gap:8px;
+    gap:10px;
     border-radius:999px; 
-    padding:8px 16px; 
+    padding:10px 20px; 
     font-weight:800; 
-    letter-spacing:.3px;
+    letter-spacing:.4px;
     box-shadow: 0 4px 12px rgba(0,0,0,.2);
-    font-size:14px;
+    font-size:18px;
   }
   
   .b-ok { 
@@ -884,19 +885,41 @@ function renderBoards(porRede){
 }
 
 async function exportBoardPNG(contentEl, rede){
+  const tempContainer = document.createElement('div');
+  tempContainer.style.position = 'fixed';
+  tempContainer.style.left = '-9999px';
+  tempContainer.style.top = '0';
+  tempContainer.style.width = contentEl.offsetWidth + 'px';
+  tempContainer.style.background = 'transparent';
+  
+  const clone = contentEl.cloneNode(true);
+  clone.style.margin = '0';
+  clone.style.padding = '0';
+  clone.style.border = 'none';
+  clone.style.borderRadius = '0';
+  clone.style.boxShadow = 'none';
+  
+  tempContainer.appendChild(clone);
+  document.body.appendChild(tempContainer);
+  
   const scale = 3;
-  const canvas = await html2canvas(contentEl, {
-    backgroundColor: '#ffffff',
+  const canvas = await html2canvas(clone, {
+    backgroundColor: contentEl.closest('[data-theme]').dataset.theme === 'dark-premium' ? '#0f172a' : '#ffffff',
     scale,
-    windowWidth: contentEl.scrollWidth,
-    windowHeight: contentEl.scrollHeight,
     logging: false,
     useCORS: true,
+    allowTaint: true,
+    width: clone.scrollWidth,
+    height: clone.scrollHeight,
+    windowWidth: clone.scrollWidth,
+    windowHeight: clone.scrollHeight,
     x: 0,
     y: 0,
     scrollX: 0,
     scrollY: 0
   });
+  
+  document.body.removeChild(tempContainer);
   
   const link = document.createElement('a');
   link.download = `painel-${(rede||'rede').replace(/[^\w\-]+/g,'_')}.png`;
@@ -914,7 +937,7 @@ document.getElementById('btn-export-all').addEventListener('click', async ()=>{
   for (let i = 0; i < contents.length; i++){
     const board = contents[i].closest('.board');
     await exportBoardPNG(contents[i], board.dataset.rede || 'painel');
-    await new Promise(r=>setTimeout(r,200));
+    await new Promise(r=>setTimeout(r,300));
   }
   
   alert(`✓ ${contents.length} painéis exportados com sucesso!`);
