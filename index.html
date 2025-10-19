@@ -346,7 +346,6 @@
   }
 
   .board-export-content{
-    border-radius:0;
     overflow:hidden;
     background:var(--theme-bg);
   }
@@ -817,6 +816,7 @@ function renderBoards(porRede){
 
     const exportContent = document.createElement('div');
     exportContent.className = 'board-export-content';
+    exportContent.dataset.theme = currentTheme;
 
     const head = document.createElement('div');
     head.className = 'board-head';
@@ -885,41 +885,24 @@ function renderBoards(porRede){
 }
 
 async function exportBoardPNG(contentEl, rede){
-  const tempContainer = document.createElement('div');
-  tempContainer.style.position = 'fixed';
-  tempContainer.style.left = '-9999px';
-  tempContainer.style.top = '0';
-  tempContainer.style.width = contentEl.offsetWidth + 'px';
-  tempContainer.style.background = 'transparent';
+  const theme = contentEl.dataset.theme;
   
-  const clone = contentEl.cloneNode(true);
-  clone.style.margin = '0';
-  clone.style.padding = '0';
-  clone.style.border = 'none';
-  clone.style.borderRadius = '0';
-  clone.style.boxShadow = 'none';
-  
-  tempContainer.appendChild(clone);
-  document.body.appendChild(tempContainer);
+  let bgColor = '#ffffff';
+  if (theme === 'dark-premium') bgColor = '#0f172a';
+  else if (theme === 'ocean') bgColor = '#ecfeff';
+  else if (theme === 'sunset') bgColor = '#fff7ed';
+  else if (theme === 'forest') bgColor = '#f0fdf4';
   
   const scale = 3;
-  const canvas = await html2canvas(clone, {
-    backgroundColor: contentEl.closest('[data-theme]').dataset.theme === 'dark-premium' ? '#0f172a' : '#ffffff',
+  const canvas = await html2canvas(contentEl, {
+    backgroundColor: bgColor,
     scale,
     logging: false,
     useCORS: true,
     allowTaint: true,
-    width: clone.scrollWidth,
-    height: clone.scrollHeight,
-    windowWidth: clone.scrollWidth,
-    windowHeight: clone.scrollHeight,
-    x: 0,
-    y: 0,
-    scrollX: 0,
-    scrollY: 0
+    imageTimeout: 0,
+    removeContainer: true
   });
-  
-  document.body.removeChild(tempContainer);
   
   const link = document.createElement('a');
   link.download = `painel-${(rede||'rede').replace(/[^\w\-]+/g,'_')}.png`;
