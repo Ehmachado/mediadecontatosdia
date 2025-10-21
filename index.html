@@ -556,7 +556,7 @@
           <label class="file btn"><input id="file-carteiras" type="file" accept=".xlsx,.csv" />📁 Carregar arquivo</label>
           <label class="controls"><input id="save-carteiras" type="checkbox" /> Salvar</label>
           <button class="btn" id="load-carteiras">Carregar salvo</button>
-          <button class="b6tn" id="clear-carteiras">Limpar</button>
+          <button class="btn" id="clear-carteiras">Limpar</button>
         </div>
       </div>
 
@@ -799,7 +799,6 @@ document.getElementById('btn-processar').addEventListener('click', ()=>{
     contatosPorDep[dep] = (contatosPorDep[dep]||0) + qtd;
   });
 
-  // Mapeamento por 3 colunas: Prefixo | Dependência | Rede
   const redePorDependencia = {};
   const redePorPrefixo = {};
   
@@ -809,11 +808,9 @@ document.getElementById('btn-processar').addEventListener('click', ()=>{
     const rede = String(row[2]||'').trim() || 'Sem Rede';
     
     if(dependencia){
-      // Mapeamento direto por dependência (prioridade)
       redePorDependencia[dependencia] = rede;
     }
     if(prefixo){
-      // Mapeamento por prefixo (fallback)
       redePorPrefixo[prefixo] = rede;
     }
   });
@@ -826,14 +823,11 @@ document.getElementById('btn-processar').addEventListener('click', ()=>{
     const real = contatosPorDep[dep]||0;
     const pct = meta>0 ? (real/meta)*100 : 0;
     
-    // Busca rede: primeiro por dependência exata, depois por prefixo
     let rede = 'Sem Rede';
     
-    // 1. Tenta match exato com dependência
     if(redePorDependencia[dep]){
       rede = redePorDependencia[dep];
     } else {
-      // 2. Tenta match por prefixo
       for(const prefixo in redePorPrefixo){
         if(dep.startsWith(prefixo)){
           rede = redePorPrefixo[prefixo];
@@ -851,10 +845,10 @@ document.getElementById('btn-processar').addEventListener('click', ()=>{
     porRede[l.rede].push(l);
   });
 
-  renderBoards(porRede);
+  renderBoards(porRede, linhas);
 });
 
-function renderBoards(porRede){
+function renderBoards(porRede, todasLinhas){
   const wrap = document.getElementById('boards');
   wrap.innerHTML = '';
   const redes = Object.keys(porRede).sort((a,b)=>a.localeCompare(b,'pt-BR',{sensitivity:'base'}));
@@ -864,6 +858,92 @@ function renderBoards(porRede){
     return;
   }
 
+  // PAINEL ESPECIAL: Agências abaixo de 100%
+  const abaixoDe100 = todasLinhas.filter(l => l.pct < 100).sort((a,b)=> a.pct - b.pct);
+  
+  if(abaixoDe100.length > 0){
+    const totalMeta = abaixoDe100.reduce((s,i)=>s+i.meta,0);
+    const totalReal = abaixoDe100.reduce((s,i)=>s+i.realizado,0);
+    const pctGeral = totalMeta>0 ? (totalReal/totalMeta)*100 : 0;
+    const [klass] = pctBadge(pctGeral);
+
+    const board = document.createElement('div');
+    board.className = 'board';
+    board.dataset.rede = 'Abaixo de 100%';
+    board.dataset.theme = currentTheme;
+
+    const exportContent = document.createElement('div');
+    exportContent.className = 'board-export-content';
+    exportContent.dataset.theme = currentTheme;
+
+    const head = document.createElement('div');
+    head.className = 'board-head';
+    head.innerHTML = `
+      <div class="board-title-wrapper">
+        <img src="logo.png" alt="Logo" class="board-logo" onerror="this.style.display='none'">
+        <div class="board-title-text">
+          <div class="board-super">Super Barreiras</div>
+          <div class="board-rede">⚠️ Agências Abaixo de 100%</div>
+        </div>
+      </div>
+      <div class="board-sub">
+        <span class="badge ${klass}">${fmtPct(pctGeral)}</span>
+        <span>Agências: <strong>${abaixoDe100.length}</strong></span>
+        <span>Meta total: <strong>${fmtInt(totalMeta)}</strong></span>
+        <span>Realizado: <strong>${fmtInt(totalReal)}</strong></span>
+      </div>
+    `;
+    exportContent.appendChild(head);
+
+    const body = document.createElement('div');
+    body.className = 'board-body';
+
+    const tbl = document.createElement('table');
+    const thead = document.createElement('thead');
+    thead.innerHTML = `
+      <tr>
+        <th>Dependência</th>
+        <th>Rede</th>
+        <th class="right">Carteiras</th>
+        <th class="right">Meta</th>
+        <th class="right">Realizado</th>
+        <th class="right">% Ating.</th>
+      </tr>`;
+    tbl.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    abaixoDe100.forEach((it)=>{
+      const tr = document.createElement('tr');
+      const [k] = pctBadge(it.pct);
+      tr.innerHTML = `
+        <td><strong>${it.dependencia}</strong></td>
+        <td>${it.rede}</td>
+        <td class="right">${fmtInt(it.carteiras)}</td>
+        <td class="right">${fmtInt(it.meta)}</td>
+        <td class="right">${fmtInt(it.realizado)}</td>
+        <td class="right"><span class="badge ${k}">${fmtPct(it.pct)}</span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    tbl.appendChild(tbody);
+    body.appendChild(tbl);
+    exportContent.appendChild(body);
+    
+    board.appendChild(exportContent);
+
+    const foot = document.createElement('div');
+    foot.className = 'board-foot';
+    const btn = document.createElement('button');
+    btn.className = 'btn';
+    btn.innerHTML = '💾 Exportar PNG';
+    btn.addEventListener('click', ()=> exportBoardPNG(exportContent, 'Abaixo_de_100'));
+    foot.appendChild(btn);
+    board.appendChild(foot);
+
+    wrap.appendChild(board);
+  }
+
+  // PAINÉIS POR REDE
   redes.forEach(rede=>{
     const items = porRede[rede].slice().sort((a,b)=> b.pct - a.pct);
     const totalMeta = items.reduce((s,i)=>s+i.meta,0);
