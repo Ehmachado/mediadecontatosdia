@@ -986,7 +986,6 @@ function renderBoards(porRede, todasLinhas){
       <tr>
         <th>Dependência</th>
         <th>Rede</th>
-        <th class="right">Carteiras</th>
         <th class="right">Meta</th>
         <th class="right">Realizado</th>
         <th class="right">% Ating.</th>
@@ -1000,7 +999,6 @@ function renderBoards(porRede, todasLinhas){
       tr.innerHTML = `
         <td><strong>${it.dependencia}</strong></td>
         <td>${it.rede}</td>
-        <td class="right">${fmtInt(it.carteiras)}</td>
         <td class="right">${fmtInt(it.meta)}</td>
         <td class="right">${fmtInt(it.realizado)}</td>
         <td class="right"><span class="badge ${k}">${fmtPct(it.pct)}</span></td>
@@ -1035,7 +1033,7 @@ async function exportBoardPNG(contentEl, rede){
   else if (theme === 'sunset') bgColor = '#fff7ed';
   else if (theme === 'forest') bgColor = '#f0fdf4';
   
-  const scale = 3;
+  const scale = 4;
   const canvas = await html2canvas(contentEl, {
     backgroundColor: bgColor,
     scale,
@@ -1043,12 +1041,17 @@ async function exportBoardPNG(contentEl, rede){
     useCORS: true,
     allowTaint: true,
     imageTimeout: 0,
-    removeContainer: true
+    removeContainer: true,
+    foreignObjectRendering: false,
+    width: contentEl.scrollWidth,
+    height: contentEl.scrollHeight,
+    windowWidth: contentEl.scrollWidth,
+    windowHeight: contentEl.scrollHeight
   });
   
   const link = document.createElement('a');
   link.download = `painel-${(rede||'rede').replace(/[^\w\-]+/g,'_')}.png`;
-  link.href = canvas.toDataURL('image/png');
+  link.href = canvas.toDataURL('image/png', 1.0);
   link.click();
 }
 
@@ -1062,7 +1065,7 @@ document.getElementById('btn-export-all').addEventListener('click', async ()=>{
   for (let i = 0; i < contents.length; i++){
     const board = contents[i].closest('.board');
     await exportBoardPNG(contents[i], board.dataset.rede || 'painel');
-    await new Promise(r=>setTimeout(r,300));
+    await new Promise(r=>setTimeout(r,400));
   }
   
   alert(`✓ ${contents.length} painéis exportados com sucesso!`);
