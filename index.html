@@ -556,7 +556,7 @@
           <label class="file btn"><input id="file-carteiras" type="file" accept=".xlsx,.csv" />📁 Carregar arquivo</label>
           <label class="controls"><input id="save-carteiras" type="checkbox" /> Salvar</label>
           <button class="btn" id="load-carteiras">Carregar salvo</button>
-          <button class="btn" id="clear-carteiras">Limpar</button>
+          <button class="b6tn" id="clear-carteiras">Limpar</button>
         </div>
       </div>
 
@@ -574,9 +574,9 @@
       <hr/>
 
       <h2>🌐 Mapeamento de Redes</h2>
-      <div class="hint">Colunas: <strong>Prefixo | Rede</strong></div>
+      <div class="hint">Colunas: <strong>Prefixo | Dependência | Rede</strong> (3 colunas)</div>
       <div class="row">
-        <textarea id="tx-redes" placeholder="123;Rede Oeste&#10;987;Rede Centro"></textarea>
+        <textarea id="tx-redes" placeholder="123;Agência 123;Rede Oeste&#10;987;Agência 987;Rede Centro"></textarea>
         <div class="controls">
           <label class="file btn"><input id="file-redes" type="file" accept=".xlsx,.csv" />📁 Carregar arquivo</label>
           <label class="controls"><input id="save-redes" type="checkbox" /> Salvar</label>
@@ -674,7 +674,6 @@ const txCarteiras = document.getElementById('tx-carteiras');
 const txContatos = document.getElementById('tx-contatos');
 const txRedes = document.getElementById('tx-redes');
 
-// Aviso quando colar em Carteiras
 txCarteiras.addEventListener('paste', ()=>{
   setTimeout(()=>{
     if(txCarteiras.value.trim()){
@@ -683,7 +682,6 @@ txCarteiras.addEventListener('paste', ()=>{
   }, 100);
 });
 
-// Aviso quando colar em Contatos
 txContatos.addEventListener('paste', ()=>{
   setTimeout(()=>{
     if(txContatos.value.trim()){
@@ -692,7 +690,6 @@ txContatos.addEventListener('paste', ()=>{
   }, 100);
 });
 
-// Aviso quando colar em Redes
 txRedes.addEventListener('paste', ()=>{
   setTimeout(()=>{
     if(txRedes.value.trim()){
@@ -714,7 +711,7 @@ document.getElementById('file-carteiras').addEventListener('change', async (e)=>
 document.getElementById('file-redes').addEventListener('change', async (e)=>{
   const f = e.target.files[0]; if(!f) return;
   const rows = await readFileToRows(f);
-  txRedes.value = rows.map(r => (r||[]).slice(0,2).join(';')).join('\n');
+  txRedes.value = rows.map(r => (r||[]).slice(0,3).join(';')).join('\n');
   alert('✓ Redes carregadas');
   if (document.getElementById('save-redes').checked){
     localStorage.setItem(LS_KEYS.redes, txRedes.value);
@@ -802,28 +799,46 @@ document.getElementById('btn-processar').addEventListener('click', ()=>{
     contatosPorDep[dep] = (contatosPorDep[dep]||0) + qtd;
   });
 
-  // Mapeamento por PREFIXO (primeira coluna)
+  // Mapeamento por 3 colunas: Prefixo | Dependência | Rede
+  const redePorDependencia = {};
   const redePorPrefixo = {};
+  
   (r3||[]).forEach(row=>{
     const prefixo = String(row[0]||'').trim();
-    const rede = String(row[1]||'').trim() || 'Sem Rede';
-    if(!prefixo) return;
-    redePorPrefixo[prefixo] = rede;
+    const dependencia = String(row[1]||'').trim();
+    const rede = String(row[2]||'').trim() || 'Sem Rede';
+    
+    if(dependencia){
+      // Mapeamento direto por dependência (prioridade)
+      redePorDependencia[dependencia] = rede;
+    }
+    if(prefixo){
+      // Mapeamento por prefixo (fallback)
+      redePorPrefixo[prefixo] = rede;
+    }
   });
 
   const linhas = [];
   const deps = new Set([...Object.keys(carteirasPorDep), ...Object.keys(contatosPorDep)]);
   deps.forEach(dep=>{
-    const cart = carteirasPorDep[dep]||0;const meta = cart * 10;
+    const cart = carteirasPorDep[dep]||0;
+    const meta = cart * 10;
     const real = contatosPorDep[dep]||0;
     const pct = meta>0 ? (real/meta)*100 : 0;
     
-    // Busca rede por prefixo da dependência
+    // Busca rede: primeiro por dependência exata, depois por prefixo
     let rede = 'Sem Rede';
-    for(const prefixo in redePorPrefixo){
-      if(dep.startsWith(prefixo)){
-        rede = redePorPrefixo[prefixo];
-        break;
+    
+    // 1. Tenta match exato com dependência
+    if(redePorDependencia[dep]){
+      rede = redePorDependencia[dep];
+    } else {
+      // 2. Tenta match por prefixo
+      for(const prefixo in redePorPrefixo){
+        if(dep.startsWith(prefixo)){
+          rede = redePorPrefixo[prefixo];
+          break;
+        }
       }
     }
     
