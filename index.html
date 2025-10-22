@@ -347,12 +347,12 @@
 
   .board-export-content{
     background:var(--theme-bg);
-    width:900px;
-    height:1200px;
+    width:1000px;
+    height:1600px;
   }
   
   .board-head{
-    padding:30px 24px;
+    padding:50px 40px;
     background:var(--theme-header-bg);
     border-bottom:2px solid rgba(0,0,0,.1);
   }
@@ -361,8 +361,8 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:14px;
-    padding:16px 26px;
+    gap:20px;
+    padding:24px 40px;
     border-radius:999px;
     background:rgba(0,0,0,.2);
     backdrop-filter: blur(10px);
@@ -371,8 +371,8 @@
   }
 
   .board-logo{
-    width:44px;
-    height:44px;
+    width:60px;
+    height:60px;
     object-fit:contain;
     filter: drop-shadow(0 2px 8px rgba(0,0,0,.3));
   }
@@ -381,45 +381,45 @@
     display:flex;
     flex-direction:column;
     align-items:center;
-    gap:2px;
+    gap:4px;
   }
 
   .board-super{
-    font-size:13px;
+    font-size:18px;
     font-weight:600;
     color:rgba(255,255,255,.8);
-    letter-spacing:.5px;
+    letter-spacing:.6px;
     text-transform:uppercase;
   }
 
   .board-rede{
-    font-size:21px;
+    font-size:32px;
     font-weight:900;
     color:#fff;
-    letter-spacing:-.3px;
+    letter-spacing:-.4px;
   }
   
   .board-sub{
-    margin-top:16px; 
+    margin-top:24px; 
     display:flex; 
     justify-content:center; 
-    gap:12px; 
+    gap:18px; 
     flex-wrap:wrap; 
     color:rgba(255,255,255,.95); 
-    font-size:13px;
+    font-size:18px;
     font-weight:500;
   }
 
   .badge{
     display:inline-flex; 
     align-items:center; 
-    gap:6px;
+    gap:8px;
     border-radius:999px; 
-    padding:6px 14px; 
+    padding:10px 20px; 
     font-weight:800; 
-    letter-spacing:.3px;
+    letter-spacing:.4px;
     box-shadow: 0 4px 12px rgba(0,0,0,.2);
-    font-size:13px;
+    font-size:18px;
   }
   
   .b-ok { 
@@ -443,32 +443,32 @@
   }
 
   .board-body{
-    padding:24px 24px;
+    padding:40px 40px;
   }
 
   table{
     width:100%; 
     border-collapse:separate; 
     border-spacing:0; 
-    border-radius:12px;
+    border-radius:16px;
     box-shadow: 0 4px 16px rgba(0,0,0,.1);
   }
   
   thead th{
     text-align:left; 
-    font-size:11px;
+    font-size:16px;
     color:var(--theme-text); 
-    padding:10px 10px;
+    padding:16px 14px;
     background:var(--theme-table-header); 
     border-bottom:2px solid rgba(0,0,0,.1);
     font-weight:700;
     text-transform:uppercase;
-    letter-spacing:.4px;
+    letter-spacing:.5px;
   }
   
   tbody td{
-    padding:10px 10px; 
-    font-size:12px; 
+    padding:16px 14px; 
+    font-size:17px; 
     border-bottom:1px solid rgba(0,0,0,.05); 
     color:var(--theme-text);
   }
@@ -903,11 +903,11 @@ function renderBoards(porRede, todasLinhas){
     const thead = document.createElement('thead');
     thead.innerHTML = `
       <tr>
-        <th style="width:32%">Dependência</th>
+        <th style="width:34%">Dependência</th>
         <th class="right" style="width:14%">Cart.</th>
         <th class="right" style="width:16%">Meta</th>
         <th class="right" style="width:16%">Real.</th>
-        <th class="right" style="width:22%">% Ating.</th>
+        <th class="right" style="width:20%">% Ating.</th>
       </tr>`;
     tbl.appendChild(thead);
 
@@ -916,11 +916,11 @@ function renderBoards(porRede, todasLinhas){
       const tr = document.createElement('tr');
       const [k] = pctBadge(it.pct);
       tr.innerHTML = `
-        <td style="width:32%"><strong>${it.dependencia}</strong></td>
+        <td style="width:34%"><strong>${it.dependencia}</strong></td>
         <td class="right" style="width:14%">${fmtInt(it.carteiras)}</td>
         <td class="right" style="width:16%">${fmtInt(it.meta)}</td>
         <td class="right" style="width:16%">${fmtInt(it.realizado)}</td>
-        <td class="right" style="width:22%"><span class="badge ${k}">${fmtPct(it.pct)}</span></td>
+        <td class="right" style="width:20%"><span class="badge ${k}">${fmtPct(it.pct)}</span></td>
       `;
       tbody.appendChild(tr);
     });
@@ -967,7 +967,7 @@ function renderBoards(porRede, todasLinhas){
         <img src="logo.png" alt="Logo" class="board-logo" onerror="this.style.display='none'">
         <div class="board-title-text">
           <div class="board-super">Super Barreiras</div>
-          <div class="board-rede">⚠️ Abaixo de 100%</div>
+          <div class="board-rede">⚠️ Agências Abaixo de 100%</div>
         </div>
       </div>
       <div class="board-sub">
@@ -986,11 +986,11 @@ function renderBoards(porRede, todasLinhas){
     const thead = document.createElement('thead');
     thead.innerHTML = `
       <tr>
-        <th style="width:28%">Dependência</th>
+        <th style="width:30%">Dependência</th>
         <th style="width:24%">Rede</th>
         <th class="right" style="width:14%">Meta</th>
         <th class="right" style="width:14%">Real.</th>
-        <th class="right" style="width:20%">% Ating.</th>
+        <th class="right" style="width:18%">% Ating.</th>
       </tr>`;
     tbl.appendChild(thead);
 
@@ -999,11 +999,11 @@ function renderBoards(porRede, todasLinhas){
       const tr = document.createElement('tr');
       const [k] = pctBadge(it.pct);
       tr.innerHTML = `
-        <td style="width:28%"><strong>${it.dependencia}</strong></td>
+        <td style="width:30%"><strong>${it.dependencia}</strong></td>
         <td style="width:24%">${it.rede}</td>
         <td class="right" style="width:14%">${fmtInt(it.meta)}</td>
         <td class="right" style="width:14%">${fmtInt(it.realizado)}</td>
-        <td class="right" style="width:20%"><span class="badge ${k}">${fmtPct(it.pct)}</span></td>
+        <td class="right" style="width:18%"><span class="badge ${k}">${fmtPct(it.pct)}</span></td>
       `;
       tbody.appendChild(tr);
     });
@@ -1045,10 +1045,10 @@ async function exportBoardPNG(contentEl, rede){
     allowTaint: true,
     imageTimeout: 0,
     removeContainer: true,
-    width: 900,
-    height: 1200,
-    windowWidth: 900,
-    windowHeight: 1200,
+    width: 1000,
+    height: 1600,
+    windowWidth: 1000,
+    windowHeight: 1600,
     scrollX: 0,
     scrollY: 0
   });
