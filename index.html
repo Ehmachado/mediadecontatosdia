@@ -346,14 +346,13 @@
   }
 
   .board-export-content{
-    overflow:visible;
     background:var(--theme-bg);
-    padding:20px;
-    min-width:100%;
+    width:1200px;
+    min-height:600px;
   }
   
   .board-head{
-    padding:24px;
+    padding:40px 50px;
     background:var(--theme-header-bg);
     border-bottom:2px solid rgba(0,0,0,.1);
   }
@@ -444,55 +443,34 @@
   }
 
   .board-body{
-    padding:20px 24px;
+    padding:40px 50px;
   }
 
   table{
     width:100%; 
     border-collapse:separate; 
     border-spacing:0; 
-    overflow:visible; 
     border-radius:16px;
     box-shadow: 0 4px 16px rgba(0,0,0,.1);
-    table-layout:fixed;
   }
   
   thead th{
     text-align:left; 
-    font-size:13px;
+    font-size:14px;
     color:var(--theme-text); 
-    padding:14px 16px;
+    padding:16px 20px;
     background:var(--theme-table-header); 
     border-bottom:2px solid rgba(0,0,0,.1);
     font-weight:700;
     text-transform:uppercase;
     letter-spacing:.5px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-  
-  thead th:first-child{
-    width:35%;
-  }
-  
-  thead th:nth-child(2),
-  thead th:nth-child(3),
-  thead th:nth-child(4){
-    width:15%;
-  }
-  
-  thead th:last-child{
-    width:20%;
   }
   
   tbody td{
-    padding:14px 16px; 
-    font-size:14px; 
+    padding:16px 20px; 
+    font-size:15px; 
     border-bottom:1px solid rgba(0,0,0,.05); 
     color:var(--theme-text);
-    overflow:hidden;
-    text-overflow:ellipsis;
   }
   
   tbody tr:nth-child(odd){ 
@@ -925,11 +903,11 @@ function renderBoards(porRede, todasLinhas){
     const thead = document.createElement('thead');
     thead.innerHTML = `
       <tr>
-        <th>Dependência</th>
-        <th class="right">Carteiras</th>
-        <th class="right">Meta</th>
-        <th class="right">Realizado</th>
-        <th class="right">% Ating.</th>
+        <th style="width:40%">Dependência</th>
+        <th class="right" style="width:15%">Carteiras</th>
+        <th class="right" style="width:15%">Meta</th>
+        <th class="right" style="width:15%">Realizado</th>
+        <th class="right" style="width:15%">% Ating.</th>
       </tr>`;
     tbl.appendChild(thead);
 
@@ -938,11 +916,11 @@ function renderBoards(porRede, todasLinhas){
       const tr = document.createElement('tr');
       const [k] = pctBadge(it.pct);
       tr.innerHTML = `
-        <td><strong>${it.dependencia}</strong></td>
-        <td class="right">${fmtInt(it.carteiras)}</td>
-        <td class="right">${fmtInt(it.meta)}</td>
-        <td class="right">${fmtInt(it.realizado)}</td>
-        <td class="right"><span class="badge ${k}">${fmtPct(it.pct)}</span></td>
+        <td style="width:40%"><strong>${it.dependencia}</strong></td>
+        <td class="right" style="width:15%">${fmtInt(it.carteiras)}</td>
+        <td class="right" style="width:15%">${fmtInt(it.meta)}</td>
+        <td class="right" style="width:15%">${fmtInt(it.realizado)}</td>
+        <td class="right" style="width:15%"><span class="badge ${k}">${fmtPct(it.pct)}</span></td>
       `;
       tbody.appendChild(tr);
     });
@@ -1008,11 +986,11 @@ function renderBoards(porRede, todasLinhas){
     const thead = document.createElement('thead');
     thead.innerHTML = `
       <tr>
-        <th>Dependência</th>
-        <th>Rede</th>
-        <th class="right">Meta</th>
-        <th class="right">Realizado</th>
-        <th class="right">% Ating.</th>
+        <th style="width:30%">Dependência</th>
+        <th style="width:25%">Rede</th>
+        <th class="right" style="width:15%">Meta</th>
+        <th class="right" style="width:15%">Realizado</th>
+        <th class="right" style="width:15%">% Ating.</th>
       </tr>`;
     tbl.appendChild(thead);
 
@@ -1021,11 +999,11 @@ function renderBoards(porRede, todasLinhas){
       const tr = document.createElement('tr');
       const [k] = pctBadge(it.pct);
       tr.innerHTML = `
-        <td><strong>${it.dependencia}</strong></td>
-        <td>${it.rede}</td>
-        <td class="right">${fmtInt(it.meta)}</td>
-        <td class="right">${fmtInt(it.realizado)}</td>
-        <td class="right"><span class="badge ${k}">${fmtPct(it.pct)}</span></td>
+        <td style="width:30%"><strong>${it.dependencia}</strong></td>
+        <td style="width:25%">${it.rede}</td>
+        <td class="right" style="width:15%">${fmtInt(it.meta)}</td>
+        <td class="right" style="width:15%">${fmtInt(it.realizado)}</td>
+        <td class="right" style="width:15%"><span class="badge ${k}">${fmtPct(it.pct)}</span></td>
       `;
       tbody.appendChild(tr);
     });
@@ -1057,15 +1035,7 @@ async function exportBoardPNG(contentEl, rede){
   else if (theme === 'sunset') bgColor = '#fff7ed';
   else if (theme === 'forest') bgColor = '#f0fdf4';
   
-  // Adiciona padding extra temporariamente
-  const originalPadding = contentEl.style.padding;
-  contentEl.style.padding = '40px';
-  
-  const scale = 3;
-  
-  // Calcula dimensões com margem extra
-  const width = contentEl.scrollWidth + 80;
-  const height = contentEl.scrollHeight + 80;
+  const scale = 2;
   
   const canvas = await html2canvas(contentEl, {
     backgroundColor: bgColor,
@@ -1075,19 +1045,13 @@ async function exportBoardPNG(contentEl, rede){
     allowTaint: true,
     imageTimeout: 0,
     removeContainer: true,
-    foreignObjectRendering: false,
-    width: width,
-    height: height,
-    windowWidth: width,
-    windowHeight: height,
-    x: -40,
-    y: -40,
+    width: 1200,
+    height: contentEl.scrollHeight,
+    windowWidth: 1200,
+    windowHeight: contentEl.scrollHeight,
     scrollX: 0,
     scrollY: 0
   });
-  
-  // Restaura padding original
-  contentEl.style.padding = originalPadding;
   
   const link = document.createElement('a');
   link.download = `painel-${(rede||'rede').replace(/[^\w\-]+/g,'_')}.png`;
