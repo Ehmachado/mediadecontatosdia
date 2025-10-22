@@ -348,7 +348,6 @@
   .board-export-content{
     background:var(--theme-bg);
     width:500px;
-    height:800px;
     display:flex;
     flex-direction:column;
   }
@@ -670,6 +669,17 @@ function pctBadge(p){
   return ['b-bad','<50%'];
 }
 
+function calculateHeight(numRows){
+  const headerHeight = 180;
+  const rowHeight = 39;
+  const paddingBottom = 40;
+  
+  const minHeight = 800;
+  const calculatedHeight = headerHeight + (numRows * rowHeight) + paddingBottom;
+  
+  return Math.max(minHeight, calculatedHeight);
+}
+
 async function readFileToRows(file){
   const buf = await file.arrayBuffer();
   const wb = XLSX.read(buf, {type:'array'});
@@ -874,6 +884,8 @@ function renderBoards(porRede, todasLinhas){
     const pctGeral = totalMeta>0 ? (totalReal/totalMeta)*100 : 0;
     const [klass] = pctBadge(pctGeral);
 
+    const dynamicHeight = calculateHeight(items.length);
+
     const board = document.createElement('div');
     board.className = 'board';
     board.dataset.rede = rede;
@@ -882,6 +894,8 @@ function renderBoards(porRede, todasLinhas){
     const exportContent = document.createElement('div');
     exportContent.className = 'board-export-content';
     exportContent.dataset.theme = currentTheme;
+    exportContent.style.height = dynamicHeight + 'px';
+    exportContent.dataset.height = dynamicHeight;
 
     const head = document.createElement('div');
     head.className = 'board-head';
@@ -957,6 +971,8 @@ function renderBoards(porRede, todasLinhas){
     const pctGeral = totalMeta>0 ? (totalReal/totalMeta)*100 : 0;
     const [klass] = pctBadge(pctGeral);
 
+    const dynamicHeight = calculateHeight(abaixoDe100.length);
+
     const board = document.createElement('div');
     board.className = 'board';
     board.dataset.rede = 'Abaixo de 100%';
@@ -965,6 +981,8 @@ function renderBoards(porRede, todasLinhas){
     const exportContent = document.createElement('div');
     exportContent.className = 'board-export-content';
     exportContent.dataset.theme = currentTheme;
+    exportContent.style.height = dynamicHeight + 'px';
+    exportContent.dataset.height = dynamicHeight;
 
     const head = document.createElement('div');
     head.className = 'board-head';
@@ -1034,6 +1052,7 @@ function renderBoards(porRede, todasLinhas){
 
 async function exportBoardPNG(contentEl, rede){
   const theme = contentEl.dataset.theme;
+  const height = parseInt(contentEl.dataset.height) || 800;
   
   let bgColor = '#ffffff';
   if (theme === 'dark-premium') bgColor = '#0f172a';
@@ -1052,9 +1071,9 @@ async function exportBoardPNG(contentEl, rede){
     imageTimeout: 0,
     removeContainer: true,
     width: 500,
-    height: 800,
+    height: height,
     windowWidth: 500,
-    windowHeight: 800,
+    windowHeight: height,
     scrollX: 0,
     scrollY: 0
   });
