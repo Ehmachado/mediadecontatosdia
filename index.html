@@ -347,14 +347,14 @@
 
   .board-export-content{
     background:var(--theme-bg);
-    width:1000px;
-    height:1600px;
+    width:500px;
+    height:800px;
     display:flex;
     flex-direction:column;
   }
   
   .board-head{
-    padding:45px 35px;
+    padding:30px 20px;
     background:var(--theme-header-bg);
     border-bottom:2px solid rgba(0,0,0,.1);
     flex-shrink:0;
@@ -364,8 +364,8 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:20px;
-    padding:22px 36px;
+    gap:12px;
+    padding:14px 20px;
     border-radius:999px;
     background:rgba(0,0,0,.2);
     backdrop-filter: blur(10px);
@@ -374,8 +374,8 @@
   }
 
   .board-logo{
-    width:65px;
-    height:65px;
+    width:45px;
+    height:45px;
     object-fit:contain;
     filter: drop-shadow(0 2px 8px rgba(0,0,0,.3));
   }
@@ -384,45 +384,45 @@
     display:flex;
     flex-direction:column;
     align-items:center;
-    gap:4px;
+    gap:2px;
   }
 
   .board-super{
-    font-size:20px;
+    font-size:14px;
     font-weight:600;
     color:rgba(255,255,255,.8);
-    letter-spacing:.6px;
+    letter-spacing:.5px;
     text-transform:uppercase;
   }
 
   .board-rede{
-    font-size:38px;
+    font-size:27px;
     font-weight:900;
     color:#fff;
-    letter-spacing:-.4px;
+    letter-spacing:-.3px;
   }
   
   .board-sub{
-    margin-top:22px; 
+    margin-top:14px; 
     display:flex; 
     justify-content:center; 
-    gap:18px; 
+    gap:10px; 
     flex-wrap:wrap; 
     color:rgba(255,255,255,.95); 
-    font-size:20px;
+    font-size:14px;
     font-weight:500;
   }
 
   .badge{
     display:inline-flex; 
     align-items:center; 
-    gap:8px;
+    gap:5px;
     border-radius:999px; 
-    padding:11px 22px; 
+    padding:7px 14px; 
     font-weight:800; 
-    letter-spacing:.4px;
+    letter-spacing:.3px;
     box-shadow: 0 4px 12px rgba(0,0,0,.2);
-    font-size:20px;
+    font-size:14px;
   }
   
   .b-ok { 
@@ -446,7 +446,7 @@
   }
 
   .board-body{
-    padding:35px 35px 35px 35px;
+    padding:20px 18px;
     flex:1;
     display:flex;
     flex-direction:column;
@@ -456,26 +456,26 @@
     width:100%; 
     border-collapse:separate; 
     border-spacing:0; 
-    border-radius:16px;
+    border-radius:12px;
     box-shadow: 0 4px 16px rgba(0,0,0,.1);
     flex:1;
   }
   
   thead th{
     text-align:left; 
-    font-size:22px;
+    font-size:16px;
     color:var(--theme-text); 
-    padding:20px 16px;
+    padding:12px 10px;
     background:var(--theme-table-header); 
     border-bottom:2px solid rgba(0,0,0,.1);
     font-weight:700;
     text-transform:uppercase;
-    letter-spacing:.5px;
+    letter-spacing:.4px;
   }
   
   tbody td{
-    padding:20px 16px; 
-    font-size:21px; 
+    padding:12px 10px; 
+    font-size:15px; 
     border-bottom:1px solid rgba(0,0,0,.05); 
     color:var(--theme-text);
   }
@@ -973,7 +973,7 @@ function renderBoards(porRede, todasLinhas){
         <img src="logo.png" alt="Logo" class="board-logo" onerror="this.style.display='none'">
         <div class="board-title-text">
           <div class="board-super">Super Barreiras</div>
-          <div class="board-rede">⚠️ Agências Abaixo de 100%</div>
+          <div class="board-rede">⚠️ Abaixo de 100%</div>
         </div>
       </div>
       <div class="board-sub">
@@ -1041,7 +1041,7 @@ async function exportBoardPNG(contentEl, rede){
   else if (theme === 'sunset') bgColor = '#fff7ed';
   else if (theme === 'forest') bgColor = '#f0fdf4';
   
-  const scale = 2;
+  const scale = 3.2;
   
   const canvas = await html2canvas(contentEl, {
     backgroundColor: bgColor,
@@ -1051,10 +1051,10 @@ async function exportBoardPNG(contentEl, rede){
     allowTaint: true,
     imageTimeout: 0,
     removeContainer: true,
-    width: 1000,
-    height: 1600,
-    windowWidth: 1000,
-    windowHeight: 1600,
+    width: 500,
+    height: 800,
+    windowWidth: 500,
+    windowHeight: 800,
     scrollX: 0,
     scrollY: 0
   });
