@@ -3,1093 +3,1173 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Super Barreiras — Metas de Contatos</title>
+<title>Super Barreiras — Painéis de Metas</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.20.3/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-  :root{
-    --bb-azul:#0033A0;
-    --bb-amarelo:#FFCC00;
-    --bb-azul-escuro:#001a66;
-    --bg:#0a0e1f;
-    --border:#1e2a4d;
-    --panel-bg:rgba(15,23,42,.85);
-    --text-primary:#f8fafc;
-    --text-secondary:#cbd5e1;
-  }
+:root {
+  --bb-azul: #0033A0;
+  --bb-amarelo: #FFCC00;
+  --bg-dark: #0a0e1f;
+  --text-light: #f8fafc;
+  --text-secondary: #cbd5e1;
+}
 
-  [data-theme="bb-classic"] {
-    --theme-primary:#0033A0;
-    --theme-secondary:#FFCC00;
-    --theme-bg:#ffffff;
-    --theme-text:#0b1026;
-    --theme-header-bg:linear-gradient(135deg, #0033A0 0%, #0052cc 100%);
-    --theme-table-header:#E9F1FF;
-    --theme-row-odd:#ffffff;
-    --theme-row-even:#F2F6FF;
-  }
-  
-  [data-theme="dark-premium"] {
-    --theme-primary:#6366f1;
-    --theme-secondary:#a855f7;
-    --theme-bg:#0f172a;
-    --theme-text:#f1f5f9;
-    --theme-header-bg:linear-gradient(135deg, #1e293b 0%, #334155 100%);
-    --theme-table-header:#1e293b;
-    --theme-row-odd:#1e293b;
-    --theme-row-even:#0f172a;
-  }
-  
-  [data-theme="ocean"] {
-    --theme-primary:#0891b2;
-    --theme-secondary:#06b6d4;
-    --theme-bg:#ecfeff;
-    --theme-text:#164e63;
-    --theme-header-bg:linear-gradient(135deg, #0e7490 0%, #0891b2 100%);
-    --theme-table-header:#cffafe;
-    --theme-row-odd:#ffffff;
-    --theme-row-even:#f0fdfa;
-  }
-  
-  [data-theme="sunset"] {
-    --theme-primary:#dc2626;
-    --theme-secondary:#f97316;
-    --theme-bg:#fff7ed;
-    --theme-text:#7c2d12;
-    --theme-header-bg:linear-gradient(135deg, #dc2626 0%, #f97316 100%);
-    --theme-table-header:#fed7aa;
-    --theme-row-odd:#ffffff;
-    --theme-row-even:#ffedd5;
-  }
-  
-  [data-theme="forest"] {
-    --theme-primary:#059669;
-    --theme-secondary:#10b981;
-    --theme-bg:#f0fdf4;
-    --theme-text:#064e3b;
-    --theme-header-bg:linear-gradient(135deg, #047857 0%, #059669 100%);
-    --theme-table-header:#d1fae5;
-    --theme-row-odd:#ffffff;
-    --theme-row-even:#dcfce7;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-  *{box-sizing:border-box;margin:0;padding:0}
-  
-  body{
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    background: radial-gradient(ellipse at top, #1e293b 0%, #0f172a 50%, #020617 100%);
-    color:var(--text-primary);
-    min-height:100vh;
-    line-height:1.6;
-  }
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: var(--text-light);
+  min-height: 100vh;
+  padding: 20px;
+}
 
-  header{
-    padding:32px 24px;
-    background: linear-gradient(135deg, var(--bb-azul) 0%, #0052cc 50%, #1e40af 100%);
-    border-bottom:2px solid rgba(255,204,0,.3);
-    position:sticky; 
-    top:0; 
-    z-index:100;
-    box-shadow: 0 10px 40px rgba(0,0,0,.3);
-    backdrop-filter: blur(12px);
-  }
-  
-  .brand{
-    display:flex; 
-    align-items:center; 
-    gap:20px; 
-    max-width:1400px; 
-    margin:0 auto;
-  }
-  
-  .logo{
-    width:56px; 
-    height:56px; 
-    border-radius:16px; 
-    background:linear-gradient(135deg, var(--bb-amarelo) 0%, #ffd700 100%);
-    box-shadow:0 8px 24px rgba(255,204,0,.4), 0 0 0 4px rgba(255,204,0,.1);
-    display:grid; 
-    place-items:center; 
-    color:#0b1026; 
-    font-weight:900;
-    font-size:24px;
-    letter-spacing:-1px;
-  }
-  
-  h1{
-    margin:0; 
-    font-size:28px; 
-    letter-spacing:-.5px;
-    font-weight:800;
-    text-shadow: 0 2px 12px rgba(0,0,0,.2);
-  }
-  
-  .sub{
-    font-size:14px; 
-    color:#dbeafe;
-    font-weight:500;
-    margin-top:4px;
-  }
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
 
-  main{
-    max-width:1400px; 
-    margin:40px auto; 
-    padding:0 24px;
-  }
-  
-  .grid{
-    display:grid; 
-    gap:24px; 
+header {
+  background: linear-gradient(135deg, var(--bb-azul) 0%, #0052cc 100%);
+  padding: 30px;
+  border-radius: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo {
+  width: 60px;
+  height: 60px;
+  background: var(--bb-amarelo);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 900;
+  color: #000;
+  box-shadow: 0 5px 15px rgba(255, 204, 0, 0.4);
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0;
+  color: white;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #dbeafe;
+  margin-top: 5px;
+}
+
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+@media (max-width: 1100px) {
+  .main-grid {
     grid-template-columns: 1fr;
   }
-  
-  @media (min-width:1100px){ 
-    .grid{grid-template-columns: 1.3fr 1fr;} 
-  }
+}
 
-  .panel{
-    background: linear-gradient(135deg, rgba(30,41,59,.95) 0%, rgba(15,23,42,.95) 100%);
-    border:1px solid rgba(148,163,184,.2); 
-    border-radius:24px; 
-    padding:28px;
-    box-shadow: 0 20px 60px rgba(0,0,0,.4), 
-                inset 0 1px 0 rgba(255,255,255,.05),
-                0 0 0 1px rgba(255,255,255,.02);
-    backdrop-filter: blur(20px);
-  }
-  
-  .panel h2{
-    margin:0 0 8px; 
-    font-size:18px; 
-    color:var(--text-primary); 
-    display:flex; 
-    align-items:center; 
-    gap:12px;
-    font-weight:700;
-    letter-spacing:-.3px;
-  }
-  
-  .hint{
-    color:var(--text-secondary); 
-    font-size:13px; 
-    margin:0 0 16px;
-    line-height:1.5;
-  }
-  
-  .row{display:grid; gap:12px}
-  
-  textarea{
-    width:100%; 
-    min-height:140px; 
-    padding:16px; 
-    resize:vertical;
-    border-radius:16px; 
-    border:2px solid rgba(148,163,184,.2); 
-    background:rgba(15,23,42,.6); 
-    color:#e2e8f0;
-    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
-    font-size:13px; 
-    line-height:1.6;
-    transition: all .2s;
-  }
-  
-  textarea:focus{
-    outline:none;
-    border-color:var(--bb-amarelo);
-    box-shadow: 0 0 0 3px rgba(255,204,0,.1);
-  }
-  
-  .controls{
-    display:flex; 
-    flex-wrap:wrap; 
-    gap:10px;
-    align-items:center;
-  }
-  
-  .btn{
-    appearance:none; 
-    border:1px solid rgba(148,163,184,.2); 
-    background:linear-gradient(135deg, rgba(51,65,85,.8), rgba(30,41,59,.8));
-    color:#f1f5f9; 
-    padding:12px 20px; 
-    border-radius:12px; 
-    font-weight:600; 
-    cursor:pointer;
-    box-shadow: 0 4px 16px rgba(0,0,0,.2);
-    transition: all .2s;
-    font-size:14px;
-  }
-  
-  .btn:hover{
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,.3);
-    border-color:rgba(148,163,184,.4);
-  }
-  
-  .btn.primary{
-    background:linear-gradient(135deg, var(--bb-amarelo), #ffd700);
-    color:#0b1026; 
-    border:none;
-    text-shadow:0 1px 0 rgba(255,255,255,.3);
-    font-weight:700;
-  }
-  
-  .btn.primary:hover{
-    background:linear-gradient(135deg, #ffd700, var(--bb-amarelo));
-  }
-  
-  .file{
-    display:inline-block; 
-    position:relative; 
-    overflow:hidden;
-  }
-  
-  .file input[type=file]{
-    position:absolute; 
-    inset:0; 
-    opacity:0; 
-    cursor:pointer;
-  }
-  
-  .pill{
-    display:inline-flex; 
-    align-items:center; 
-    gap:8px; 
-    padding:8px 16px; 
-    border-radius:999px;
-    background:rgba(59,130,246,.15); 
-    border:1px solid rgba(59,130,246,.3); 
-    color:#93c5fd; 
-    font-size:13px;
-    font-weight:600;
-  }
+.panel {
+  background: rgba(30, 41, 59, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
 
-  .theme-selector{
-    margin-top:16px;
-    padding:20px;
-    background:rgba(30,41,59,.5);
-    border-radius:16px;
-    border:1px solid rgba(148,163,184,.15);
-  }
-  
-  .theme-selector h3{
-    font-size:15px;
-    margin-bottom:12px;
-    color:var(--text-primary);
-    font-weight:700;
-  }
-  
-  .theme-options{
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap:10px;
-  }
-  
-  .theme-btn{
-    padding:12px;
-    border-radius:12px;
-    border:2px solid transparent;
-    cursor:pointer;
-    transition:all .2s;
-    text-align:center;
-    font-size:13px;
-    font-weight:600;
-  }
-  
-  .theme-btn.active{
-    border-color:var(--bb-amarelo);
-    box-shadow: 0 0 0 3px rgba(255,204,0,.2);
-  }
-  
-  .theme-btn:hover{
-    transform:scale(1.05);
-  }
-  
-  .theme-btn[data-theme="bb-classic"]{
-    background:linear-gradient(135deg, #0033A0, #0052cc);
-    color:#fff;
-  }
-  
-  .theme-btn[data-theme="dark-premium"]{
-    background:linear-gradient(135deg, #6366f1, #a855f7);
-    color:#fff;
-  }
-  
-  .theme-btn[data-theme="ocean"]{
-    background:linear-gradient(135deg, #0891b2, #06b6d4);
-    color:#fff;
-  }
-  
-  .theme-btn[data-theme="sunset"]{
-    background:linear-gradient(135deg, #dc2626, #f97316);
-    color:#fff;
-  }
-  
-  .theme-btn[data-theme="forest"]{
-    background:linear-gradient(135deg, #059669, #10b981);
-    color:#fff;
-  }
+.panel h2 {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: var(--bb-amarelo);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-  .boards{margin-top:24px; display:grid; gap:24px}
-  
-  .board{
-    border:2px solid rgba(148,163,184,.15); 
-    border-radius:24px; 
-    overflow:hidden;
-    background:var(--theme-bg);
-    box-shadow: 0 20px 60px rgba(0,0,0,.4);
-    transition: transform .3s;
-  }
-  
-  .board:hover{
-    transform: translateY(-4px);
-  }
+.hint {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
 
-  .board-export-content{
-    background:var(--theme-bg);
-    width:500px;
-  }
-  
-  .board-head{
-    padding:30px 20px;
-    background:var(--theme-header-bg);
-    border-bottom:2px solid rgba(0,0,0,.1);
-  }
-  
-  .board-title-wrapper{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:12px;
-    padding:14px 20px;
-    border-radius:999px;
-    background:rgba(0,0,0,.2);
-    backdrop-filter: blur(10px);
-    border:2px solid rgba(255,255,255,.1);
-    box-shadow: 0 8px 24px rgba(0,0,0,.3);
-  }
+textarea {
+  width: 100%;
+  min-height: 150px;
+  padding: 15px;
+  border-radius: 12px;
+  border: 2px solid rgba(148, 163, 184, 0.3);
+  background: rgba(15, 23, 42, 0.6);
+  color: #e2e8f0;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  resize: vertical;
+  margin-bottom: 15px;
+}
 
-  .board-logo{
-    width:45px;
-    height:45px;
-    object-fit:contain;
-    filter: drop-shadow(0 2px 8px rgba(0,0,0,.3));
-  }
+textarea:focus {
+  outline: none;
+  border-color: var(--bb-amarelo);
+  box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.1);
+}
 
-  .board-title-text{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:2px;
-  }
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
 
-  .board-super{
-    font-size:14px;
-    font-weight:600;
-    color:rgba(255,255,255,.8);
-    letter-spacing:.5px;
-    text-transform:uppercase;
-  }
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(51, 65, 85, 0.8);
+  color: white;
+}
 
-  .board-rede{
-    font-size:27px;
-    font-weight:900;
-    color:#fff;
-    letter-spacing:-.3px;
-  }
-  
-  .board-sub{
-    margin-top:14px; 
-    display:flex; 
-    justify-content:center; 
-    gap:10px; 
-    flex-wrap:wrap; 
-    color:rgba(255,255,255,.95); 
-    font-size:14px;
-    font-weight:500;
-  }
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
 
-  .badge{
-    display:inline-flex; 
-    align-items:center; 
-    gap:5px;
-    border-radius:999px; 
-    padding:7px 14px; 
-    font-weight:800; 
-    letter-spacing:.3px;
-    box-shadow: 0 4px 12px rgba(0,0,0,.2);
-    font-size:14px;
-  }
-  
-  .b-ok { 
-    background:#2E7D32; 
-    color:#fff; 
-  }
-  
-  .b-mid { 
-    background:#F9A825; 
-    color:#111827; 
-  }
-  
-  .b-warn{ 
-    background:#EF6C00; 
-    color:#fff; 
-  }
-  
-  .b-bad { 
-    background:#C62828; 
-    color:#fff; 
-  }
+.btn-primary {
+  background: linear-gradient(135deg, var(--bb-amarelo), #ffd700);
+  color: #000;
+  font-weight: 700;
+}
 
-  .board-body{
-    padding:20px 18px;
-  }
+.btn-primary:hover {
+  background: linear-gradient(135deg, #ffd700, var(--bb-amarelo));
+}
 
-  table{
-    width:100%; 
-    border-collapse:separate; 
-    border-spacing:0; 
-    border-radius:12px;
-    box-shadow: 0 4px 16px rgba(0,0,0,.1);
-  }
-  
-  thead th{
-    text-align:left; 
-    font-size:16px;
-    color:var(--theme-text); 
-    padding:12px 10px;
-    background:var(--theme-table-header); 
-    border-bottom:2px solid rgba(0,0,0,.1);
-    font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:.4px;
-  }
-  
-  tbody td{
-    padding:12px 10px; 
-    font-size:15px; 
-    border-bottom:1px solid rgba(0,0,0,.05); 
-    color:var(--theme-text);
-  }
-  
-  tbody tr:nth-child(odd){ 
-    background:var(--theme-row-odd); 
-  }
-  
-  tbody tr:nth-child(even){ 
-    background:var(--theme-row-even); 
-  }
-  
-  tbody tr:hover{
-    background:rgba(59,130,246,.08);
-  }
-  
-  .right{text-align:right}
+.file-input {
+  position: relative;
+  display: inline-block;
+}
 
-  .board-foot{
-    display:flex; 
-    justify-content:flex-end; 
-    gap:12px;
-    padding:20px 24px;
-    background:rgba(0,0,0,.05);
-  }
+.file-input input[type="file"] {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
 
-  .empty{
-    padding:40px; 
-    color:#94a3b8; 
-    border:2px dashed rgba(148,163,184,.2); 
-    border-radius:16px; 
-    background:rgba(15,23,42,.3);
-    text-align:center;
-    font-size:15px;
-  }
-  
-  footer{
-    max-width:1400px; 
-    margin:40px auto 80px; 
-    padding:0 24px; 
-    color:#94a3b8; 
-    font-size:13px;
-    text-align:center;
-  }
+.theme-selector {
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 15px;
+}
 
-  hr{
-    border:none;
-    border-top:1px solid rgba(148,163,184,.2); 
-    margin:24px 0;
-  }
+.theme-selector h3 {
+  font-size: 16px;
+  margin-bottom: 15px;
+  color: var(--bb-amarelo);
+}
 
-  label.controls{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    color:var(--text-secondary);
-    font-size:14px;
-    cursor:pointer;
-  }
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
 
-  input[type="checkbox"]{
-    width:18px;
-    height:18px;
-    cursor:pointer;
-  }
+.theme-option {
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+  font-weight: 600;
+  font-size: 13px;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.theme-option:hover {
+  transform: scale(1.05);
+}
+
+.theme-option.active {
+  border-color: var(--bb-amarelo);
+  box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.2);
+}
+
+.theme-classic { background: linear-gradient(135deg, #0033A0, #0052cc); color: white; }
+.theme-dark { background: linear-gradient(135deg, #6366f1, #a855f7); color: white; }
+.theme-ocean { background: linear-gradient(135deg, #0891b2, #06b6d4); color: white; }
+.theme-sunset { background: linear-gradient(135deg, #dc2626, #f97316); color: white; }
+.theme-forest { background: linear-gradient(135deg, #059669, #10b981); color: white; }
+
+.results {
+  margin-top: 30px;
+}
+
+.board-list {
+  display: grid;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.board {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.board-actions {
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Estilos para exportação */
+.export-container {
+  position: fixed;
+  left: -9999px;
+  top: 0;
+}
+
+.board-content {
+  background: white;
+  width: 500px;
+  font-family: Arial, sans-serif;
+}
+
+.board-content[data-theme="dark"] { background: #0f172a; }
+.board-content[data-theme="ocean"] { background: #ecfeff; }
+.board-content[data-theme="sunset"] { background: #fff7ed; }
+.board-content[data-theme="forest"] { background: #f0fdf4; }
+
+.board-header {
+  padding: 30px 25px;
+  background: linear-gradient(135deg, #0033A0 0%, #0052cc 100%);
+}
+
+.board-header[data-theme="dark"] {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+}
+
+.board-header[data-theme="ocean"] {
+  background: linear-gradient(135deg, #0e7490 0%, #0891b2 100%);
+}
+
+.board-header[data-theme="sunset"] {
+  background: linear-gradient(135deg, #dc2626 0%, #f97316 100%);
+}
+
+.board-header[data-theme="forest"] {
+  background: linear-gradient(135deg, #047857 0%, #059669 100%);
+}
+
+.board-title-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  padding: 15px 25px;
+  border-radius: 50px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.board-logo {
+  width: 50px;
+  height: 50px;
+  background: #FFCC00;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 900;
+  color: #000;
+}
+
+.board-title-text {
+  text-align: center;
+}
+
+.board-super {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.board-name {
+  font-size: 28px;
+  font-weight: 900;
+  color: white;
+  margin-top: 2px;
+}
+
+.board-stats {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.stat-badge {
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.badge-success { background: #2E7D32; color: white; }
+.badge-warning { background: #F9A825; color: #000; }
+.badge-danger { background: #EF6C00; color: white; }
+.badge-critical { background: #C62828; color: white; }
+
+.board-body {
+  padding: 25px 20px;
+}
+
+.board-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.board-table thead th {
+  background: #E9F1FF;
+  padding: 14px 12px;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0b1026;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.board-table[data-theme="dark"] thead th {
+  background: #1e293b;
+  color: #f1f5f9;
+}
+
+.board-table[data-theme="ocean"] thead th {
+  background: #cffafe;
+  color: #164e63;
+}
+
+.board-table[data-theme="sunset"] thead th {
+  background: #fed7aa;
+  color: #7c2d12;
+}
+
+.board-table[data-theme="forest"] thead th {
+  background: #d1fae5;
+  color: #064e3b;
+}
+
+.board-table tbody td {
+  padding: 14px 12px;
+  font-size: 14px;
+  color: #0b1026;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.board-table[data-theme="dark"] tbody td {
+  color: #f1f5f9;
+}
+
+.board-table[data-theme="ocean"] tbody td {
+  color: #164e63;
+}
+
+.board-table[data-theme="sunset"] tbody td {
+  color: #7c2d12;
+}
+
+.board-table[data-theme="forest"] tbody td {
+  color: #064e3b;
+}
+
+.board-table tbody tr:nth-child(odd) {
+  background: #ffffff;
+}
+
+.board-table tbody tr:nth-child(even) {
+  background: #F2F6FF;
+}
+
+.board-table[data-theme="dark"] tbody tr:nth-child(odd) {
+  background: #1e293b;
+}
+
+.board-table[data-theme="dark"] tbody tr:nth-child(even) {
+  background: #0f172a;
+}
+
+.board-table[data-theme="ocean"] tbody tr:nth-child(odd) {
+  background: #ffffff;
+}
+
+.board-table[data-theme="ocean"] tbody tr:nth-child(even) {
+  background: #f0fdfa;
+}
+
+.board-table[data-theme="sunset"] tbody tr:nth-child(odd) {
+  background: #ffffff;
+}
+
+.board-table[data-theme="sunset"] tbody tr:nth-child(even) {
+  background: #ffedd5;
+}
+
+.board-table[data-theme="forest"] tbody tr:nth-child(odd) {
+  background: #ffffff;
+}
+
+.board-table[data-theme="forest"] tbody tr:nth-child(even) {
+  background: #dcfce7;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-bold {
+  font-weight: 700;
+}
+
+.cell-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 50px;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #94a3b8;
+  font-size: 16px;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  margin: 25px 0;
+}
+
+footer {
+  text-align: center;
+  padding: 30px;
+  color: #94a3b8;
+  font-size: 14px;
+}
 </style>
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <div class="logo">BB</div>
-      <div>
-        <h1>Painéis por Rede — Meta de Contatos</h1>
-        <div class="sub">Sistema inteligente de visualização e exportação</div>
+  <div class="container">
+    <header>
+      <div class="header-content">
+        <div class="logo">BB</div>
+        <div>
+          <h1>Painéis por Rede — Metas de Contatos</h1>
+          <div class="subtitle">Sistema inteligente de visualização e exportação de dados</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="main-grid">
+      <!-- PAINEL DE ENTRADA -->
+      <div class="panel">
+        <h2>📊 Entrada de Dados</h2>
+
+        <div>
+          <h3 style="font-size: 16px; margin-bottom: 10px; color: white;">Carteiras por Agência</h3>
+          <div class="hint">3 colunas: Nome | Dependência | Carteira (Meta = 10 × carteiras)</div>
+          <textarea id="txt-carteiras" placeholder="Maria Silva;Agência 123;Grupo A&#10;João Souza;Agência 456;Grupo B"></textarea>
+          <div class="controls">
+            <div class="file-input">
+              <button class="btn">📁 Carregar Arquivo</button>
+              <input type="file" id="file-carteiras" accept=".xlsx,.xls,.csv" />
+            </div>
+            <label style="display: flex; align-items: center; gap: 8px; color: white;">
+              <input type="checkbox" id="save-carteiras" />
+              <span>Salvar automaticamente</span>
+            </label>
+          </div>
+        </div>
+
+        <hr />
+
+        <div>
+          <h3 style="font-size: 16px; margin-bottom: 10px; color: white;">Contatos Realizados</h3>
+          <div class="hint">7 colunas (usa coluna 2 e 7) OU 2 colunas simples: Dependência | Quantidade</div>
+          <textarea id="txt-contatos" placeholder="Cód;Agência 123;UF;...;...;...;28&#10;OU&#10;Agência 123;28"></textarea>
+        </div>
+
+        <hr />
+
+        <div>
+          <h3 style="font-size: 16px; margin-bottom: 10px; color: white;">Mapeamento de Redes</h3>
+          <div class="hint">3 colunas: Prefixo | Dependência | Nome da Rede</div>
+          <textarea id="txt-redes" placeholder="123;Agência 123;Rede Oeste&#10;456;Agência 456;Rede Centro"></textarea>
+          <div class="controls">
+            <div class="file-input">
+              <button class="btn">📁 Carregar Arquivo</button>
+              <input type="file" id="file-redes" accept=".xlsx,.xls,.csv" />
+            </div>
+            <label style="display: flex; align-items: center; gap: 8px; color: white;">
+              <input type="checkbox" id="save-redes" />
+              <span>Salvar automaticamente</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="theme-selector">
+          <h3>🎨 Tema dos Painéis</h3>
+          <div class="theme-grid">
+            <div class="theme-option theme-classic active" data-theme="classic">BB Classic</div>
+            <div class="theme-option theme-dark" data-theme="dark">Dark Premium</div>
+            <div class="theme-option theme-ocean" data-theme="ocean">Ocean</div>
+            <div class="theme-option theme-sunset" data-theme="sunset">Sunset</div>
+            <div class="theme-option theme-forest" data-theme="forest">Forest</div>
+          </div>
+        </div>
+
+        <div class="controls" style="margin-top: 25px;">
+          <button class="btn btn-primary" id="btn-processar" style="flex: 1;">⚡ Processar & Gerar Painéis</button>
+        </div>
+      </div>
+
+      <!-- PAINEL DE RESULTADOS -->
+      <div class="panel">
+        <h2>📈 Resultados Gerados</h2>
+        <div class="hint">Painéis organizados por rede com opções de exportação individual ou em lote</div>
+        
+        <div class="controls">
+          <button class="btn btn-primary" id="btn-export-all">💾 Exportar Todas as Redes (PNG)</button>
+          <button class="btn" id="btn-clear">🗑️ Limpar Resultados</button>
+        </div>
+
+        <div id="results-area">
+          <div class="empty-state">
+            Aguardando dados...<br />
+            Preencha os campos ao lado e clique em Processar
+          </div>
+        </div>
       </div>
     </div>
-  </header>
 
-  <main class="grid">
-    <section class="panel">
-      <h2>📊 Carteiras por Agência <span class="pill">Meta = 10 × carteiras</span></h2>
-      <div class="hint">Colunas: <strong>Nome | Dependência | Carteira</strong></div>
-      <div class="row">
-        <textarea id="tx-carteiras" placeholder="Maria Silva;Agência 123;Grupo A&#10;João Souza;Agência 123;Grupo B"></textarea>
-        <div class="controls">
-          <label class="file btn"><input id="file-carteiras" type="file" accept=".xlsx,.csv" />📁 Carregar arquivo</label>
-          <label class="controls"><input id="save-carteiras" type="checkbox" /> Salvar</label>
-          <button class="btn" id="load-carteiras">Carregar salvo</button>
-          <button class="btn" id="clear-carteiras">Limpar</button>
-        </div>
-      </div>
+    <div class="results" id="board-container"></div>
+  </div>
 
-      <hr/>
-
-      <h2>✅ Contatos do Dia (Realizado)</h2>
-      <div class="hint">7 colunas: usa coluna 2 (Dependência) e 7 (Contatos) | ou 2 colunas simples</div>
-      <div class="row">
-        <textarea id="tx-contatos" placeholder="Cód;Agência 123;UF;Tipo;...;...;28"></textarea>
-        <div class="controls">
-          <button class="btn" id="clear-contatos">Limpar</button>
-        </div>
-      </div>
-
-      <hr/>
-
-      <h2>🌐 Mapeamento de Redes</h2>
-      <div class="hint">Colunas: <strong>Prefixo | Dependência | Rede</strong> (3 colunas)</div>
-      <div class="row">
-        <textarea id="tx-redes" placeholder="123;Agência 123;Rede Oeste&#10;987;Agência 987;Rede Centro"></textarea>
-        <div class="controls">
-          <label class="file btn"><input id="file-redes" type="file" accept=".xlsx,.csv" />📁 Carregar arquivo</label>
-          <label class="controls"><input id="save-redes" type="checkbox" /> Salvar</label>
-          <button class="btn" id="load-redes">Carregar salvo</button>
-          <button class="btn" id="clear-redes">Limpar</button>
-        </div>
-      </div>
-
-      <div class="theme-selector">
-        <h3>🎨 Tema dos Painéis</h3>
-        <div class="theme-options">
-          <div class="theme-btn active" data-theme="bb-classic">BB Classic</div>
-          <div class="theme-btn" data-theme="dark-premium">Dark Premium</div>
-          <div class="theme-btn" data-theme="ocean">Ocean</div>
-          <div class="theme-btn" data-theme="sunset">Sunset</div>
-          <div class="theme-btn" data-theme="forest">Forest</div>
-        </div>
-      </div>
-
-      <div class="controls" style="margin-top:24px">
-        <button class="btn primary" id="btn-processar">⚡ Processar & Gerar Painéis</button>
-      </div>
-    </section>
-
-    <section class="panel">
-      <h2>📈 Resultados por Rede</h2>
-      <div class="controls" style="margin-bottom:16px">
-        <button class="btn primary" id="btn-export-all">💾 Exportar Todas (PNG)</button>
-      </div>
-      <div id="boards" class="boards">
-        <div class="empty">Aguardando dados... Preencha os campos e clique em Processar</div>
-      </div>
-    </section>
-  </main>
+  <div class="export-container" id="export-container"></div>
 
   <footer>
-    Desenvolvido para Banco do Brasil • Aceita delimitadores: <strong>;</strong> <strong>,</strong> ou <strong>tab</strong>
+    Desenvolvido para Banco do Brasil • Aceita delimitadores: <strong>;</strong> <strong>,</strong> ou <strong>TAB</strong>
   </footer>
 
 <script>
-let currentTheme = 'bb-classic';
-
+// ===== CONFIGURAÇÃO E ESTADO =====
+let currentTheme = 'classic';
 const LS_KEYS = {
-  carteiras: "bb_carteiras_v2",
-  redes: "bb_redes_v2",
+  carteiras: 'bb_carteiras_v3',
+  redes: 'bb_redes_v3'
 };
 
-function detectDelimiter(text){
-  const s = (text.match(/;/g)||[]).length;
-  const c = (text.match(/,/g)||[]).length;
-  const t = (text.match(/\t/g)||[]).length;
-  if (t >= s && t >= c) return "\\t";
-  if (s >= c) return ";";
-  return ",";
-}
-
-function splitByDelim(line, delim){
-  if (delim === "\\t") return line.split(/\t/).map(x=>x.trim());
-  return line.split(delim).map(x=>x.trim());
-}
-
-function parseTextTable(text){
-  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-  if (!lines.length) return [];
-  const delim = detectDelimiter(text);
-  return lines.map(l => splitByDelim(l, delim));
-}
-
-function toNumber(x){
-  if (typeof x !== "string") return Number(x)||0;
-  const cleaned = x.replace(/\s/g,'').replace(/\./g,'').replace(',', '.');
-  const n = Number(cleaned);
-  return isNaN(n) ? 0 : n;
-}
-
-function fmtInt(n){ return (n||0).toLocaleString('pt-BR'); }
-function fmtPct(n){ return (n||0).toLocaleString('pt-BR', {maximumFractionDigits:1}) + "%"; }
-
-function pctBadge(p){
-  if (p >= 100) return ['b-ok','≥100%'];
-  if (p >= 80) return ['b-mid','80–99%'];
-  if (p >= 50) return ['b-warn','50–79%'];
-  return ['b-bad','<50%'];
-}
-
-function calculateHeight(numRows){
-  const HEADER_HEIGHT = 220;
-  const ROW_HEIGHT = 51;
-  const PADDING_BOTTOM = 60;
-  const MIN_HEIGHT = 800;
+// ===== FUNÇÕES UTILITÁRIAS =====
+function detectDelimiter(text) {
+  const semicolons = (text.match(/;/g) || []).length;
+  const commas = (text.match(/,/g) || []).length;
+  const tabs = (text.match(/\t/g) || []).length;
   
-  const calculatedHeight = HEADER_HEIGHT + (numRows * ROW_HEIGHT) + PADDING_BOTTOM;
+  if (tabs >= semicolons && tabs >= commas) return '\t';
+  if (semicolons >= commas) return ';';
+  return ',';
+}
+
+function parseTable(text) {
+  if (!text || !text.trim()) return [];
   
-  return Math.max(MIN_HEIGHT, calculatedHeight);
+  const lines = text.split(/\r?\n/).filter(line => line.trim());
+  if (lines.length === 0) return [];
+  
+  const delimiter = detectDelimiter(text);
+  return lines.map(line => 
+    line.split(delimiter).map(cell => cell.trim())
+  );
 }
 
-async function readFileToRows(file){
-  const buf = await file.arrayBuffer();
-  const wb = XLSX.read(buf, {type:'array'});
-  const ws = wb.Sheets[wb.SheetNames[0]];
-  const rows = XLSX.utils.sheet_to_json(ws, {header:1, raw:true});
-  return rows.filter(r => (r||[]).some(cell => String(cell||'').trim() !== ''));
+function toNumber(value) {
+  if (typeof value === 'number') return value;
+  const str = String(value).replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
+  const num = parseFloat(str);
+  return isNaN(num) ? 0 : num;
 }
 
-const txCarteiras = document.getElementById('tx-carteiras');
-const txContatos = document.getElementById('tx-contatos');
-const txRedes = document.getElementById('tx-redes');
+function formatNumber(num) {
+  return Math.round(num).toLocaleString('pt-BR');
+}
 
-txCarteiras.addEventListener('paste', ()=>{
-  setTimeout(()=>{
-    if(txCarteiras.value.trim()){
-      alert('✓ Carteiras carregadas');
-    }
-  }, 100);
-});
+function formatPercent(num) {
+  return num.toFixed(1).replace('.', ',') + '%';
+}
 
-txContatos.addEventListener('paste', ()=>{
-  setTimeout(()=>{
-    if(txContatos.value.trim()){
-      alert('✓ Contatos carregados');
-    }
-  }, 100);
-});
+function getBadgeClass(percent) {
+  if (percent >= 100) return { class: 'badge-success', label: '≥100%' };
+  if (percent >= 80) return { class: 'badge-warning', label: '80-99%' };
+  if (percent >= 50) return { class: 'badge-danger', label: '50-79%' };
+  return { class: 'badge-critical', label: '<50%' };
+}
 
-txRedes.addEventListener('paste', ()=>{
-  setTimeout(()=>{
-    if(txRedes.value.trim()){
-      alert('✓ Redes carregadas');
-    }
-  }, 100);
-});
-
-document.getElementById('file-carteiras').addEventListener('change', async (e)=>{
-  const f = e.target.files[0]; if(!f) return;
-  const rows = await readFileToRows(f);
-  txCarteiras.value = rows.map(r => (r||[]).slice(0,3).join(';')).join('\n');
-  alert('✓ Carteiras carregadas');
-  if (document.getElementById('save-carteiras').checked){
-    localStorage.setItem(LS_KEYS.carteiras, txCarteiras.value);
-  }
-});
-
-document.getElementById('file-redes').addEventListener('change', async (e)=>{
-  const f = e.target.files[0]; if(!f) return;
-  const rows = await readFileToRows(f);
-  txRedes.value = rows.map(r => (r||[]).slice(0,3).join(';')).join('\n');
-  alert('✓ Redes carregadas');
-  if (document.getElementById('save-redes').checked){
-    localStorage.setItem(LS_KEYS.redes, txRedes.value);
-  }
-});
-
-document.getElementById('load-carteiras').onclick = ()=>{
-  const v = localStorage.getItem(LS_KEYS.carteiras);
-  if (v) {
-    txCarteiras.value = v;
-    alert('✓ Carteiras carregadas');
-  }
-};
-
-document.getElementById('clear-carteiras').onclick = ()=>{
-  txCarteiras.value = '';
-  localStorage.removeItem(LS_KEYS.carteiras);
-  alert('✓ Carteiras limpas');
-};
-
-document.getElementById('load-redes').onclick = ()=>{
-  const v = localStorage.getItem(LS_KEYS.redes);
-  if (v) {
-    txRedes.value = v;
-    alert('✓ Redes carregadas');
-  }
-};
-
-document.getElementById('clear-redes').onclick = ()=>{
-  txRedes.value = '';
-  localStorage.removeItem(LS_KEYS.redes);
-  alert('✓ Redes limpas');
-};
-
-document.getElementById('clear-contatos').onclick = ()=>{
-  txContatos.value = '';
-  alert('✓ Contatos limpos');
-};
-
-document.querySelectorAll('.theme-btn').forEach(btn => {
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentTheme = btn.dataset.theme;
+// ===== PROCESSAMENTO DE ARQUIVOS =====
+async function readExcelFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, raw: true });
+        const filtered = rows.filter(row => 
+          row && row.some(cell => String(cell || '').trim() !== '')
+        );
+        resolve(filtered);
+      } catch (error) {
+        reject(error);
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
   });
-});
+}
 
-document.getElementById('btn-processar').addEventListener('click', ()=>{
-  if (document.getElementById('save-carteiras').checked){
-    localStorage.setItem(LS_KEYS.carteiras, txCarteiras.value);
-  }
-  if (document.getElementById('save-redes').checked){
-    localStorage.setItem(LS_KEYS.redes, txRedes.value);
-  }
+// ===== PROCESSAMENTO DE DADOS =====
+function processData(carteirasText, contatosText, redesText) {
+  const carteiras = parseTable(carteirasText);
+  const contatos = parseTable(contatosText);
+  const redes = parseTable(redesText);
 
-  const r1 = parseTextTable(txCarteiras.value);
-  const r2 = parseTextTable(txContatos.value);
-  const r3 = parseTextTable(txRedes.value);
-
+  // Processar carteiras por dependência
   const carteirasPorDep = {};
-  (r1||[]).forEach(row=>{
-    const dep = String(row[1]||'').trim();
-    if(!dep) return;
-    carteirasPorDep[dep] = (carteirasPorDep[dep]||0) + 1;
+  carteiras.forEach(row => {
+    if (row.length < 2) return;
+    const dep = String(row[1] || '').trim();
+    if (!dep) return;
+    carteirasPorDep[dep] = (carteirasPorDep[dep] || 0) + 1;
   });
 
+  // Processar contatos por dependência
   const contatosPorDep = {};
-  (r2||[]).forEach(row=>{
-    if (!row || !row.length) return;
+  contatos.forEach(row => {
+    if (!row || row.length === 0) return;
+    
     let dep = '';
-    let qtdStr = '';
+    let qtd = 0;
 
     if (row.length >= 7) {
-      dep = String(row[1]||'').trim();
-      qtdStr = String(row[6]||'').trim();
+      // Formato com 7 colunas
+      dep = String(row[1] || '').trim();
+      const qtdStr = String(row[6] || '').trim();
       if (!/\d/.test(qtdStr)) return;
+      qtd = toNumber(qtdStr);
+    } else if (row.length >= 2) {
+      // Formato com 2 colunas
+      dep = String(row[0] || '').trim();
+      const qtdStr = String(row[1] || '').trim();
+      if (!/\d/.test(qtdStr)) return;
+      qtd = toNumber(qtdStr);
     } else {
-      dep = String(row[0]||'').trim();
-      qtdStr = String(row[1]||'').trim();
-      if (!/\d/.test(qtdStr)) return;
+      return;
     }
 
     if (!dep) return;
-    const qtd = toNumber(qtdStr);
-    contatosPorDep[dep] = (contatosPorDep[dep]||0) + qtd;
+    contatosPorDep[dep] = (contatosPorDep[dep] || 0) + qtd;
   });
 
-  const redePorDependencia = {};
+  // Mapear redes
+  const redePorDep = {};
   const redePorPrefixo = {};
   
-  (r3||[]).forEach(row=>{
-    const prefixo = String(row[0]||'').trim();
-    const dependencia = String(row[1]||'').trim();
-    const rede = String(row[2]||'').trim() || 'Sem Rede';
+  redes.forEach(row => {
+    if (row.length < 3) return;
+    const prefixo = String(row[0] || '').trim();
+    const dep = String(row[1] || '').trim();
+    const rede = String(row[2] || '').trim() || 'Sem Rede';
     
-    if(dependencia){
-      redePorDependencia[dependencia] = rede;
-    }
-    if(prefixo){
-      redePorPrefixo[prefixo] = rede;
-    }
+    if (dep) redePorDep[dep] = rede;
+    if (prefixo) redePorPrefixo[prefixo] = rede;
   });
 
+  // Gerar linhas consolidadas
+  const todasDeps = new Set([
+    ...Object.keys(carteirasPorDep),
+    ...Object.keys(contatosPorDep)
+  ]);
+
   const linhas = [];
-  const deps = new Set([...Object.keys(carteirasPorDep), ...Object.keys(contatosPorDep)]);
-  deps.forEach(dep=>{
-    const cart = carteirasPorDep[dep]||0;
+  todasDeps.forEach(dep => {
+    const cart = carteirasPorDep[dep] || 0;
     const meta = cart * 10;
-    const real = contatosPorDep[dep]||0;
-    const pct = meta>0 ? (real/meta)*100 : 0;
-    
+    const real = contatosPorDep[dep] || 0;
+    const pct = meta > 0 ? (real / meta) * 100 : 0;
+
+    // Determinar rede
     let rede = 'Sem Rede';
-    
-    if(redePorDependencia[dep]){
-      rede = redePorDependencia[dep];
+    if (redePorDep[dep]) {
+      rede = redePorDep[dep];
     } else {
-      for(const prefixo in redePorPrefixo){
-        if(dep.startsWith(prefixo)){
+      for (const prefixo in redePorPrefixo) {
+        if (dep.startsWith(prefixo)) {
           rede = redePorPrefixo[prefixo];
           break;
         }
       }
     }
-    
-    linhas.push({rede, dependencia:dep, carteiras:cart, meta, realizado:real, pct});
+
+    linhas.push({
+      rede,
+      dependencia: dep,
+      carteiras: cart,
+      meta,
+      realizado: real,
+      percentual: pct
+    });
   });
 
+  // Agrupar por rede
   const porRede = {};
-  linhas.forEach(l=>{
-    if(!porRede[l.rede]) porRede[l.rede]=[];
-    porRede[l.rede].push(l);
+  linhas.forEach(linha => {
+    if (!porRede[linha.rede]) {
+      porRede[linha.rede] = [];
+    }
+    porRede[linha.rede].push(linha);
   });
 
-  renderBoards(porRede, linhas);
-});
+  return { porRede, todasLinhas: linhas };
+}
 
-function renderBoards(porRede, todasLinhas){
-  const wrap = document.getElementById('boards');
-  wrap.innerHTML = '';
-  const redes = Object.keys(porRede).sort((a,b)=>a.localeCompare(b,'pt-BR',{sensitivity:'base'}));
+// ===== RENDERIZAÇÃO DE PAINÉIS =====
+function renderBoards(porRede, todasLinhas) {
+  const container = document.getElementById('board-container');
+  const resultsArea = document.getElementById('results-area');
   
-  if (!redes.length){
-    wrap.innerHTML = '<div class="empty">Nenhum dado processado. Verifique as entradas.</div>';
+  container.innerHTML = '';
+  resultsArea.innerHTML = '';
+
+  if (Object.keys(porRede).length === 0) {
+    resultsArea.innerHTML = '<div class="empty-state">Nenhum dado processado. Verifique as entradas.</div>';
     return;
   }
 
-  redes.forEach(rede=>{
-    const items = porRede[rede].slice().sort((a,b)=> b.pct - a.pct);
-    const totalMeta = items.reduce((s,i)=>s+i.meta,0);
-    const totalReal = items.reduce((s,i)=>s+i.realizado,0);
-    const pctGeral = totalMeta>0 ? (totalReal/totalMeta)*100 : 0;
-    const [klass] = pctBadge(pctGeral);
+  // Criar lista de resumo
+  const resumoHTML = '<div class="panel"><h2>📋 Resumo dos Painéis</h2><div class="board-list" id="board-list"></div></div>';
+  resultsArea.innerHTML = resumoHTML;
+  const boardList = document.getElementById('board-list');
 
-    const dynamicHeight = calculateHeight(items.length);
+  // Ordenar redes
+  const redesOrdenadas = Object.keys(porRede).sort((a, b) => 
+    a.localeCompare(b, 'pt-BR', { sensitivity: 'base' })
+  );
 
-    const board = document.createElement('div');
-    board.className = 'board';
-    board.dataset.rede = rede;
-    board.dataset.theme = currentTheme;
+  // Criar painel para cada rede
+  redesOrdenadas.forEach(nomeRede => {
+    const items = porRede[nomeRede].sort((a, b) => b.percentual - a.percentual);
+    
+    const totalMeta = items.reduce((sum, item) => sum + item.meta, 0);
+    const totalReal = items.reduce((sum, item) => sum + item.realizado, 0);
+    const pctGeral = totalMeta > 0 ? (totalReal / totalMeta) * 100 : 0;
+    const badge = getBadgeClass(pctGeral);
 
-    const exportContent = document.createElement('div');
-    exportContent.className = 'board-export-content';
-    exportContent.dataset.theme = currentTheme;
-    exportContent.style.height = dynamicHeight + 'px';
-    exportContent.dataset.height = dynamicHeight;
-
-    const head = document.createElement('div');
-    head.className = 'board-head';
-    head.innerHTML = `
-      <div class="board-title-wrapper">
-        <img src="logo.png" alt="Logo" class="board-logo" onerror="this.style.display='none'">
-        <div class="board-title-text">
-          <div class="board-super">Super Barreiras</div>
-          <div class="board-rede">${rede}</div>
+    // Criar card de resumo
+    const card = document.createElement('div');
+    card.className = 'board';
+    card.innerHTML = `
+      <div style="padding: 25px;">
+        <h3 style="font-size: 22px; color: var(--bb-azul); margin-bottom: 15px;">${nomeRede}</h3>
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 15px;">
+          <div>
+            <div style="font-size: 13px; color: #64748b;">Atingimento</div>
+            <div style="font-size: 24px; font-weight: 800; color: ${pctGeral >= 100 ? '#2E7D32' : pctGeral >= 80 ? '#F9A825' : '#C62828'};">
+              ${formatPercent(pctGeral)}
+            </div>
+          </div>
+          <div>
+            <div style="font-size: 13px; color: #64748b;">Agências</div>
+            <div style="font-size: 24px; font-weight: 800;">${items.length}</div>
+          </div>
+          <div>
+            <div style="font-size: 13px; color: #64748b;">Meta</div>
+            <div style="font-size: 24px; font-weight: 800;">${formatNumber(totalMeta)}</div>
+          </div>
+          <div>
+            <div style="font-size: 13px; color: #64748b;">Realizado</div>
+            <div style="font-size: 24px; font-weight: 800;">${formatNumber(totalReal)}</div>
+          </div>
         </div>
       </div>
-      <div class="board-sub">
-        <span class="badge ${klass}">${fmtPct(pctGeral)}</span>
-        <span>Agências: <strong>${items.length}</strong></span>
-        <span>Meta: <strong>${fmtInt(totalMeta)}</strong></span>
-        <span>Realizado: <strong>${fmtInt(totalReal)}</strong></span>
+      <div class="board-actions">
+        <button class="btn" onclick="exportBoard('${nomeRede}')">💾 Exportar PNG</button>
       </div>
     `;
-    exportContent.appendChild(head);
-
-    const body = document.createElement('div');
-    body.className = 'board-body';
-
-    const tbl = document.createElement('table');
-    const thead = document.createElement('thead');
-    thead.innerHTML = `
-      <tr>
-        <th style="width:17%">Dep.</th>
-        <th class="right" style="width:17%">Cart.</th>
-        <th class="right" style="width:20%">Meta</th>
-        <th class="right" style="width:20%">Real.</th>
-        <th class="right" style="width:26%">% Ating.</th>
-      </tr>`;
-    tbl.appendChild(thead);
-
-    const tbody = document.createElement('tbody');
-    items.forEach((it)=>{
-      const tr = document.createElement('tr');
-      const [k] = pctBadge(it.pct);
-      tr.innerHTML = `
-        <td style="width:17%"><strong>${it.dependencia}</strong></td>
-        <td class="right" style="width:17%">${fmtInt(it.carteiras)}</td>
-        <td class="right" style="width:20%">${fmtInt(it.meta)}</td>
-        <td class="right" style="width:20%">${fmtInt(it.realizado)}</td>
-        <td class="right" style="width:26%"><span class="badge ${k}">${fmtPct(it.pct)}</span></td>
-      `;
-      tbody.appendChild(tr);
-    });
-    tbl.appendChild(tbody);
-    body.appendChild(tbl);
-    exportContent.appendChild(body);
-    
-    board.appendChild(exportContent);
-
-    const foot = document.createElement('div');
-    foot.className = 'board-foot';
-    const btn = document.createElement('button');
-    btn.className = 'btn';
-    btn.innerHTML = '💾 Exportar PNG';
-    btn.addEventListener('click', ()=> exportBoardPNG(exportContent, rede));
-    foot.appendChild(btn);
-    board.appendChild(foot);
-
-    wrap.appendChild(board);
+    boardList.appendChild(card);
   });
 
-  const abaixoDe100 = todasLinhas.filter(l => l.pct < 100).sort((a,b)=> a.pct - b.pct);
+  // Criar painel de agências abaixo de 100%
+  const abaixoDe100 = todasLinhas.filter(l => l.percentual < 100).sort((a, b) => a.percentual - b.percentual);
   
-  if(abaixoDe100.length > 0){
-    const totalMeta = abaixoDe100.reduce((s,i)=>s+i.meta,0);
-    const totalReal = abaixoDe100.reduce((s,i)=>s+i.realizado,0);
-    const pctGeral = totalMeta>0 ? (totalReal/totalMeta)*100 : 0;
-    const [klass] = pctBadge(pctGeral);
+  if (abaixoDe100.length > 0) {
+    const totalMeta = abaixoDe100.reduce((sum, item) => sum + item.meta, 0);
+    const totalReal = abaixoDe100.reduce((sum, item) => sum + item.realizado, 0);
+    const pctGeral = totalMeta > 0 ? (totalReal / totalMeta) * 100 : 0;
 
-    const dynamicHeight = calculateHeight(abaixoDe100.length);
-
-    const board = document.createElement('div');
-    board.className = 'board';
-    board.dataset.rede = 'Abaixo de 100%';
-    board.dataset.theme = currentTheme;
-
-    const exportContent = document.createElement('div');
-    exportContent.className = 'board-export-content';
-    exportContent.dataset.theme = currentTheme;
-    exportContent.style.height = dynamicHeight + 'px';
-    exportContent.dataset.height = dynamicHeight;
-
-    const head = document.createElement('div');
-    head.className = 'board-head';
-    head.innerHTML = `
-      <div class="board-title-wrapper">
-        <img src="logo.png" alt="Logo" class="board-logo" onerror="this.style.display='none'">
-        <div class="board-title-text">
-          <div class="board-super">Super Barreiras</div>
-          <div class="board-rede">⚠️ Abaixo de 100%</div>
+    const card = document.createElement('div');
+    card.className = 'board';
+    card.innerHTML = `
+      <div style="padding: 25px;">
+        <h3 style="font-size: 22px; color: #C62828; margin-bottom: 15px;">⚠️ Agências Abaixo de 100%</h3>
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 15px;">
+          <div>
+            <div style="font-size: 13px; color: #64748b;">Atingimento Médio</div>
+            <div style="font-size: 24px; font-weight: 800; color: #C62828;">
+              ${formatPercent(pctGeral)}
+            </div>
+          </div>
+          <div>
+            <div style="font-size: 13px; color: #64748b;">Agências</div>
+            <div style="font-size: 24px; font-weight: 800;">${abaixoDe100.length}</div>
+          </div>
+          <div>
+            <div style="font-size: 13px; color: #64748b;">Meta Total</div>
+            <div style="font-size: 24px; font-weight: 800;">${formatNumber(totalMeta)}</div>
+          </div>
+          <div>
+            <div style="font-size: 13px; color: #64748b;">Realizado Total</div>
+            <div style="font-size: 24px; font-weight: 800;">${formatNumber(totalReal)}</div>
+          </div>
         </div>
       </div>
-      <div class="board-sub">
-        <span class="badge ${klass}">${fmtPct(pctGeral)}</span>
-        <span>Agências: <strong>${abaixoDe100.length}</strong></span>
-        <span>Meta: <strong>${fmtInt(totalMeta)}</strong></span>
-        <span>Real: <strong>${fmtInt(totalReal)}</strong></span>
+      <div class="board-actions">
+        <button class="btn" onclick="exportBoard('Abaixo_100')">💾 Exportar PNG</button>
       </div>
     `;
-    exportContent.appendChild(head);
+    boardList.appendChild(card);
+  }
 
-    const body = document.createElement('div');
-    body.className = 'board-body';
+  // Armazenar dados para exportação
+  window.boardData = { porRede, abaixoDe100 };
+}
 
-    const tbl = document.createElement('table');
-    const thead = document.createElement('thead');
-    thead.innerHTML = `
+// ===== EXPORTAÇÃO DE PAINÉIS =====
+function createBoardHTML(nomeRede, items, stats, theme, hasRedeColumn = false) {
+  const badge = getBadgeClass(stats.percentual);
+  
+  // Calcular altura dinâmica
+  const HEADER_HEIGHT = 200;
+  const ROW_HEIGHT = 50;
+  const PADDING = 50;
+  const height = Math.max(800, HEADER_HEIGHT + (items.length * ROW_HEIGHT) + PADDING);
+
+  const themeMap = {
+    'classic': '',
+    'dark': 'dark',
+    'ocean': 'ocean',
+    'sunset': 'sunset',
+    'forest': 'forest'
+  };
+
+  const themeAttr = themeMap[theme] || '';
+
+  let tableHeaders = `
+    <tr>
+      <th style="width: 17%;">Dep.</th>
+      ${hasRedeColumn ? '<th style="width: 18%;">Rede</th>' : ''}
+      <th class="text-right" style="width: ${hasRedeColumn ? '16%' : '17%'};">Cart.</th>
+      <th class="text-right" style="width: ${hasRedeColumn ? '16%' : '20%'};">Meta</th>
+      <th class="text-right" style="width: ${hasRedeColumn ? '16%' : '20%'};">Real.</th>
+      <th class="text-right" style="width: ${hasRedeColumn ? '17%' : '26%'};">% Ating.</th>
+    </tr>
+  `;
+
+  let tableRows = items.map(item => {
+    const itemBadge = getBadgeClass(item.percentual);
+    return `
       <tr>
-        <th style="width:16%">Dep.</th>
-        <th style="width:20%">Rede</th>
-        <th class="right" style="width:18%">Meta</th>
-        <th class="right" style="width:18%">Real.</th>
-        <th class="right" style="width:28%">% Ating.</th>
-      </tr>`;
-    tbl.appendChild(thead);
+        <td style="width: 17%;"><span class="text-bold">${item.dependencia}</span></td>
+        ${hasRedeColumn ? `<td style="width: 18%;">${item.rede}</td>` : ''}
+        <td class="text-right" style="width: ${hasRedeColumn ? '16%' : '17%'};">${formatNumber(item.carteiras)}</td>
+        <td class="text-right" style="width: ${hasRedeColumn ? '16%' : '20%'};">${formatNumber(item.meta)}</td>
+        <td class="text-right" style="width: ${hasRedeColumn ? '16%' : '20%'};">${formatNumber(item.realizado)}</td>
+        <td class="text-right" style="width: ${hasRedeColumn ? '17%' : '26%'};">
+          <span class="cell-badge ${itemBadge.class}">${formatPercent(item.percentual)}</span>
+        </td>
+      </tr>
+    `;
+  }).join('');
 
-    const tbody = document.createElement('tbody');
-    abaixoDe100.forEach((it)=>{
-      const tr = document.createElement('tr');
-      const [k] = pctBadge(it.pct);
-      tr.innerHTML = `
-        <td style="width:16%"><strong>${it.dependencia}</strong></td>
-        <td style="width:20%">${it.rede}</td>
-        <td class="right" style="width:18%">${fmtInt(it.meta)}</td>
-        <td class="right" style="width:18%">${fmtInt(it.realizado)}</td>
-        <td class="right" style="width:28%"><span class="badge ${k}">${fmtPct(it.pct)}</span></td>
-      `;
-      tbody.appendChild(tr);
+  return `
+    <div class="board-content" data-theme="${themeAttr}" style="height: ${height}px;">
+      <div class="board-header" data-theme="${themeAttr}">
+        <div class="board-title-wrap">
+          <div class="board-logo">BB</div>
+          <div class="board-title-text">
+            <div class="board-super">Super Barreiras</div>
+            <div class="board-name">${nomeRede}</div>
+          </div>
+        </div>
+        <div class="board-stats">
+          <span class="stat-badge ${badge.class}">${formatPercent(stats.percentual)}</span>
+          <span>Agências: <strong>${items.length}</strong></span>
+          <span>Meta: <strong>${formatNumber(stats.meta)}</strong></span>
+          <span>Realizado: <strong>${formatNumber(stats.realizado)}</strong></span>
+        </div>
+      </div>
+      <div class="board-body">
+        <table class="board-table" data-theme="${themeAttr}">
+          <thead>${tableHeaders}</thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+async function exportBoard(nomeRede) {
+  if (!window.boardData) {
+    alert('❌ Nenhum dado disponível para exportar');
+    return;
+  }
+
+  const { porRede, abaixoDe100 } = window.boardData;
+  
+  let items, stats, hasRedeColumn = false;
+  
+  if (nomeRede === 'Abaixo_100') {
+    items = abaixoDe100;
+    hasRedeColumn = true;
+    const totalMeta = items.reduce((sum, item) => sum + item.meta, 0);
+    const totalReal = items.reduce((sum, item) => sum + item.realizado, 0);
+    const pctGeral = totalMeta > 0 ? (totalReal / totalMeta) * 100 : 0;
+    stats = { meta: totalMeta, realizado: totalReal, percentual: pctGeral };
+    nomeRede = '⚠️ Abaixo de 100%';
+  } else {
+    items = porRede[nomeRede];
+    const totalMeta = items.reduce((sum, item) => sum + item.meta, 0);
+    const totalReal = items.reduce((sum, item) => sum + item.realizado, 0);
+    const pctGeral = totalMeta > 0 ? (totalReal / totalMeta) * 100 : 0;
+    stats = { meta: totalMeta, realizado: totalReal, percentual: pctGeral };
+  }
+
+  // Criar elemento temporário
+  const container = document.getElementById('export-container');
+  const html = createBoardHTML(nomeRede, items, stats, currentTheme, hasRedeColumn);
+  container.innerHTML = html;
+
+  const element = container.firstElementChild;
+  const height = parseInt(element.style.height);
+
+  try {
+    const canvas = await html2canvas(element, {
+      backgroundColor: currentTheme === 'dark' ? '#0f172a' : 
+                      currentTheme === 'ocean' ? '#ecfeff' :
+                      currentTheme === 'sunset' ? '#fff7ed' :
+                      currentTheme === 'forest' ? '#f0fdf4' : '#ffffff',
+      scale: 2,
+      width: 500,
+      height: height,
+      windowWidth: 500,
+      windowHeight: height,
+      logging: false,
+      useCORS: true
     });
-    tbl.appendChild(tbody);
-    body.appendChild(tbl);
-    exportContent.appendChild(body);
-    
-    board.appendChild(exportContent);
 
-    const foot = document.createElement('div');
-    foot.className = 'board-foot';
-    const btn = document.createElement('button');
-    btn.className = 'btn';
-    btn.innerHTML = '💾 Exportar PNG';
-    btn.addEventListener('click', ()=> exportBoardPNG(exportContent, 'Abaixo_de_100'));
-    foot.appendChild(btn);
-    board.appendChild(foot);
+    // Download
+    const link = document.createElement('a');
+    link.download = `painel-${nomeRede.replace(/[^\w\-]/g, '_')}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
 
-    wrap.appendChild(board);
+    console.log(`✓ Painel "${nomeRede}" exportado com sucesso!`);
+  } catch (error) {
+    console.error('Erro ao exportar:', error);
+    alert('❌ Erro ao exportar painel. Tente novamente.');
+  } finally {
+    container.innerHTML = '';
   }
 }
 
-async function exportBoardPNG(contentEl, rede){
-  const theme = contentEl.dataset.theme;
-  const height = parseInt(contentEl.dataset.height) || 800;
+async function exportAllBoards() {
+  if (!window.boardData) {
+    alert('❌ Nenhum dado disponível para exportar');
+    return;
+  }
+
+  const { porRede, abaixoDe100 } = window.boardData;
+  const redes = Object.keys(porRede);
   
-  let bgColor = '#ffffff';
-  if (theme === 'dark-premium') bgColor = '#0f172a';
-  else if (theme === 'ocean') bgColor = '#ecfeff';
-  else if (theme === 'sunset') bgColor = '#fff7ed';
-  else if (theme === 'forest') bgColor = '#f0fdf4';
-  
-  const canvas = await html2canvas(contentEl, {
-    backgroundColor: bgColor,
-    scale: 2,
-    logging: false,
-    useCORS: true,
-    allowTaint: true,
-    imageTimeout: 0,
-    removeContainer: true,
-    width: 500,
-    height: height,
-    windowWidth: 500,
-    windowHeight: height,
-    scrollX: 0,
-    scrollY: 0,
-    y: 0,
-    x: 0
-  });
-  
-  const link = document.createElement('a');
-  link.download = `painel-${(rede||'rede').replace(/[^\w\-]+/g,'_')}.png`;
-  link.href = canvas.toDataURL('image/png', 1.0);
-  link.click();
+  let total = redes.length;
+  if (abaixoDe100.length > 0) total++;
+
+  if (!confirm(`Deseja exportar ${total} painéis em PNG?`)) return;
+
+  for (const rede of redes) {
+    await exportBoard(rede);
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+
+  if (abaixoDe100.length > 0) {
+    await exportBoard('Abaixo_100');
+  }
+
+  alert(`✓ ${total} painéis exportados com sucesso!`);
 }
 
-document.getElementById('btn-export-all').addEventListener('click', async ()=>{
-  const contents = Array.from(document.querySelectorAll('.board-export-content'));
-  if(!contents.length){ 
-    alert('⚠️ Nenhum painel para exportar'); 
-    return; 
+// ===== EVENT LISTENERS =====
+document.addEventListener('DOMContentLoaded', () => {
+  // Temas
+  document.querySelectorAll('.theme-option').forEach(option => {
+    option.addEventListener('click', () => {
+      document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
+      option.classList.add('active');
+      currentTheme = option.dataset.theme;
+    });
+  });
+
+  // Carregar arquivos
+  document.getElementById('file-carteiras').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    try {
+      const rows = await readExcelFile(file);
+      const text = rows.map(row => row.slice(0, 3).join(';')).join('\n');
+      document.getElementById('txt-carteiras').value = text;
+      
+      if (document.getElementById('save-carteiras').checked) {
+        localStorage.setItem(LS_KEYS.carteiras, text);
+      }
+      
+      alert('✓ Carteiras carregadas com sucesso!');
+    } catch (error) {
+      alert('❌ Erro ao ler arquivo: ' + error.message);
+    }
+  });
+
+  document.getElementById('file-redes').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    try {
+      const rows = await readExcelFile(file);
+      const text = rows.map(row => row.slice(0, 3).join(';')).join('\n');
+      document.getElementById('txt-redes').value = text;
+      
+      if (document.getElementById('save-redes').checked) {
+        localStorage.setItem(LS_KEYS.redes, text);
+      }
+      
+      alert('✓ Redes carregadas com sucesso!');
+    } catch (error) {
+      alert('❌ Erro ao ler arquivo: ' + error.message);
+    }
+  });
+
+  // Processar
+  document.getElementById('btn-processar').addEventListener('click', () => {
+    const carteiras = document.getElementById('txt-carteiras').value;
+    const contatos = document.getElementById('txt-contatos').value;
+    const redes = document.getElementById('txt-redes').value;
+
+    if (!carteiras.trim()) {
+      alert('⚠️ Por favor, insira os dados de carteiras');
+      return;
+    }
+
+    if (!contatos.trim()) {
+      alert('⚠️ Por favor, insira os dados de contatos');
+      return;
+    }
+
+    try {
+      // Salvar se marcado
+      if (document.getElementById('save-carteiras').checked) {
+        localStorage.setItem(LS_KEYS.carteiras, carteiras);
+      }
+      if (document.getElementById('save-redes').checked) {
+        localStorage.setItem(LS_KEYS.redes, redes);
+      }
+
+      const { porRede, todasLinhas } = processData(carteiras, contatos, redes);
+      renderBoards(porRede, todasLinhas);
+      
+      alert('✓ Painéis gerados com sucesso!');
+    } catch (error) {
+      console.error('Erro ao processar:', error);
+      alert('❌ Erro ao processar dados: ' + error.message);
+    }
+  });
+
+  // Exportar todos
+  document.getElementById('btn-export-all').addEventListener('click', exportAllBoards);
+
+  // Limpar
+  document.getElementById('btn-clear').addEventListener('click', () => {
+    if (confirm('Deseja limpar todos os resultados?')) {
+      document.getElementById('results-area').innerHTML = '<div class="empty-state">Aguardando dados...<br />Preencha os campos ao lado e clique em Processar</div>';
+      document.getElementById('board-container').innerHTML = '';
+      window.boardData = null;
+    }
+  });
+
+  // Carregar dados salvos
+  const savedCarteiras = localStorage.getItem(LS_KEYS.carteiras);
+  if (savedCarteiras) {
+    document.getElementById('txt-carteiras').value = savedCarteiras;
+    document.getElementById('save-carteiras').checked = true;
   }
-  
-  for (let i = 0; i < contents.length; i++){
-    const board = contents[i].closest('.board');
-    await exportBoardPNG(contents[i], board.dataset.rede || 'painel');
-    await new Promise(r=>setTimeout(r,500));
+
+  const savedRedes = localStorage.getItem(LS_KEYS.redes);
+  if (savedRedes) {
+    document.getElementById('txt-redes').value = savedRedes;
+    document.getElementById('save-redes').checked = true;
   }
-  
-  alert(`✓ ${contents.length} painéis exportados com sucesso!`);
 });
+
+// Expor função para uso global
+window.exportBoard = exportBoard;
 </script>
 </body>
 </html>
