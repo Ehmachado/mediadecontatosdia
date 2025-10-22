@@ -347,12 +347,12 @@
 
   .board-export-content{
     background:var(--theme-bg);
-    width:800px;
+    width:600px;
     min-height:400px;
   }
   
   .board-head{
-    padding:30px 24px;
+    padding:24px 20px;
     background:var(--theme-header-bg);
     border-bottom:2px solid rgba(0,0,0,.1);
   }
@@ -362,7 +362,7 @@
     align-items:center;
     justify-content:center;
     gap:12px;
-    padding:16px 24px;
+    padding:14px 20px;
     border-radius:999px;
     background:rgba(0,0,0,.2);
     backdrop-filter: blur(10px);
@@ -371,8 +371,8 @@
   }
 
   .board-logo{
-    width:40px;
-    height:40px;
+    width:36px;
+    height:36px;
     object-fit:contain;
     filter: drop-shadow(0 2px 8px rgba(0,0,0,.3));
   }
@@ -385,41 +385,41 @@
   }
 
   .board-super{
-    font-size:13px;
+    font-size:11px;
     font-weight:600;
     color:rgba(255,255,255,.8);
-    letter-spacing:.5px;
+    letter-spacing:.4px;
     text-transform:uppercase;
   }
 
   .board-rede{
-    font-size:22px;
+    font-size:18px;
     font-weight:900;
     color:#fff;
     letter-spacing:-.3px;
   }
   
   .board-sub{
-    margin-top:16px; 
+    margin-top:14px; 
     display:flex; 
     justify-content:center; 
-    gap:12px; 
+    gap:10px; 
     flex-wrap:wrap; 
     color:rgba(255,255,255,.95); 
-    font-size:13px;
+    font-size:11px;
     font-weight:500;
   }
 
   .badge{
     display:inline-flex; 
     align-items:center; 
-    gap:6px;
+    gap:5px;
     border-radius:999px; 
-    padding:6px 14px; 
+    padding:5px 12px; 
     font-weight:800; 
     letter-spacing:.3px;
     box-shadow: 0 4px 12px rgba(0,0,0,.2);
-    font-size:13px;
+    font-size:11px;
   }
   
   .b-ok { 
@@ -443,32 +443,32 @@
   }
 
   .board-body{
-    padding:24px 20px;
+    padding:20px 16px;
   }
 
   table{
     width:100%; 
     border-collapse:separate; 
     border-spacing:0; 
-    border-radius:12px;
+    border-radius:10px;
     box-shadow: 0 4px 16px rgba(0,0,0,.1);
   }
   
   thead th{
     text-align:left; 
-    font-size:11px;
+    font-size:9px;
     color:var(--theme-text); 
-    padding:10px 8px;
+    padding:8px 6px;
     background:var(--theme-table-header); 
     border-bottom:2px solid rgba(0,0,0,.1);
     font-weight:700;
     text-transform:uppercase;
-    letter-spacing:.4px;
+    letter-spacing:.3px;
   }
   
   tbody td{
-    padding:10px 8px; 
-    font-size:12px; 
+    padding:8px 6px; 
+    font-size:10px; 
     border-bottom:1px solid rgba(0,0,0,.05); 
     color:var(--theme-text);
   }
@@ -889,9 +889,9 @@ function renderBoards(porRede, todasLinhas){
       </div>
       <div class="board-sub">
         <span class="badge ${klass}">${fmtPct(pctGeral)}</span>
-        <span>Agências: <strong>${items.length}</strong></span>
+        <span>Agên: <strong>${items.length}</strong></span>
         <span>Meta: <strong>${fmtInt(totalMeta)}</strong></span>
-        <span>Realizado: <strong>${fmtInt(totalReal)}</strong></span>
+        <span>Real: <strong>${fmtInt(totalReal)}</strong></span>
       </div>
     `;
     exportContent.appendChild(head);
@@ -903,11 +903,11 @@ function renderBoards(porRede, todasLinhas){
     const thead = document.createElement('thead');
     thead.innerHTML = `
       <tr>
-        <th style="width:35%">Dependência</th>
-        <th class="right" style="width:15%">Cart.</th>
-        <th class="right" style="width:17%">Meta</th>
-        <th class="right" style="width:17%">Real.</th>
-        <th class="right" style="width:16%">% Ating.</th>
+        <th style="width:28%">Dependência</th>
+        <th class="right" style="width:14%">Cart.</th>
+        <th class="right" style="width:16%">Meta</th>
+        <th class="right" style="width:16%">Real.</th>
+        <th class="right" style="width:26%">% Ating.</th>
       </tr>`;
     tbl.appendChild(thead);
 
@@ -916,11 +916,11 @@ function renderBoards(porRede, todasLinhas){
       const tr = document.createElement('tr');
       const [k] = pctBadge(it.pct);
       tr.innerHTML = `
-        <td style="width:35%"><strong>${it.dependencia}</strong></td>
-        <td class="right" style="width:15%">${fmtInt(it.carteiras)}</td>
-        <td class="right" style="width:17%">${fmtInt(it.meta)}</td>
-        <td class="right" style="width:17%">${fmtInt(it.realizado)}</td>
-        <td class="right" style="width:16%"><span class="badge ${k}">${fmtPct(it.pct)}</span></td>
+        <td style="width:28%"><strong>${it.dependencia}</strong></td>
+        <td class="right" style="width:14%">${fmtInt(it.carteiras)}</td>
+        <td class="right" style="width:16%">${fmtInt(it.meta)}</td>
+        <td class="right" style="width:16%">${fmtInt(it.realizado)}</td>
+        <td class="right" style="width:26%"><span class="badge ${k}">${fmtPct(it.pct)}</span></td>
       `;
       tbody.appendChild(tr);
     });
@@ -967,12 +967,12 @@ function renderBoards(porRede, todasLinhas){
         <img src="logo.png" alt="Logo" class="board-logo" onerror="this.style.display='none'">
         <div class="board-title-text">
           <div class="board-super">Super Barreiras</div>
-          <div class="board-rede">⚠️ Abaixo de 100%</div>
+          <div class="board-rede">⚠️ Abaixo 100%</div>
         </div>
       </div>
       <div class="board-sub">
         <span class="badge ${klass}">${fmtPct(pctGeral)}</span>
-        <span>Agências: <strong>${abaixoDe100.length}</strong></span>
+        <span>Agên: <strong>${abaixoDe100.length}</strong></span>
         <span>Meta: <strong>${fmtInt(totalMeta)}</strong></span>
         <span>Real: <strong>${fmtInt(totalReal)}</strong></span>
       </div>
@@ -986,11 +986,11 @@ function renderBoards(porRede, todasLinhas){
     const thead = document.createElement('thead');
     thead.innerHTML = `
       <tr>
-        <th style="width:30%">Dependência</th>
+        <th style="width:25%">Dependência</th>
         <th style="width:23%">Rede</th>
-        <th class="right" style="width:15%">Meta</th>
-        <th class="right" style="width:15%">Real.</th>
-        <th class="right" style="width:17%">% Ating.</th>
+        <th class="right" style="width:14%">Meta</th>
+        <th class="right" style="width:14%">Real.</th>
+        <th class="right" style="width:24%">% Ating.</th>
       </tr>`;
     tbl.appendChild(thead);
 
@@ -999,11 +999,11 @@ function renderBoards(porRede, todasLinhas){
       const tr = document.createElement('tr');
       const [k] = pctBadge(it.pct);
       tr.innerHTML = `
-        <td style="width:30%"><strong>${it.dependencia}</strong></td>
+        <td style="width:25%"><strong>${it.dependencia}</strong></td>
         <td style="width:23%">${it.rede}</td>
-        <td class="right" style="width:15%">${fmtInt(it.meta)}</td>
-        <td class="right" style="width:15%">${fmtInt(it.realizado)}</td>
-        <td class="right" style="width:17%"><span class="badge ${k}">${fmtPct(it.pct)}</span></td>
+        <td class="right" style="width:14%">${fmtInt(it.meta)}</td>
+        <td class="right" style="width:14%">${fmtInt(it.realizado)}</td>
+        <td class="right" style="width:24%"><span class="badge ${k}">${fmtPct(it.pct)}</span></td>
       `;
       tbody.appendChild(tr);
     });
@@ -1045,9 +1045,9 @@ async function exportBoardPNG(contentEl, rede){
     allowTaint: true,
     imageTimeout: 0,
     removeContainer: true,
-    width: 800,
+    width: 600,
     height: contentEl.scrollHeight,
-    windowWidth: 800,
+    windowWidth: 600,
     windowHeight: contentEl.scrollHeight,
     scrollX: 0,
     scrollY: 0
