@@ -348,15 +348,12 @@
   .board-export-content{
     background:var(--theme-bg);
     width:500px;
-    display:flex;
-    flex-direction:column;
   }
   
   .board-head{
     padding:30px 20px;
     background:var(--theme-header-bg);
     border-bottom:2px solid rgba(0,0,0,.1);
-    flex-shrink:0;
   }
   
   .board-title-wrapper{
@@ -446,9 +443,6 @@
 
   .board-body{
     padding:20px 18px;
-    flex:1;
-    display:flex;
-    flex-direction:column;
   }
 
   table{
@@ -457,7 +451,6 @@
     border-spacing:0; 
     border-radius:12px;
     box-shadow: 0 4px 16px rgba(0,0,0,.1);
-    flex:1;
   }
   
   thead th{
@@ -670,14 +663,14 @@ function pctBadge(p){
 }
 
 function calculateHeight(numRows){
-  const headerHeight = 180;
-  const rowHeight = 40;
-  const paddingBottom = 60;
+  const HEADER_HEIGHT = 220;
+  const ROW_HEIGHT = 51;
+  const PADDING_BOTTOM = 60;
+  const MIN_HEIGHT = 800;
   
-  const minHeight = 800;
-  const calculatedHeight = headerHeight + (numRows * rowHeight) + paddingBottom;
+  const calculatedHeight = HEADER_HEIGHT + (numRows * ROW_HEIGHT) + PADDING_BOTTOM;
   
-  return Math.max(minHeight, calculatedHeight);
+  return Math.max(MIN_HEIGHT, calculatedHeight);
 }
 
 async function readFileToRows(file){
@@ -876,7 +869,6 @@ function renderBoards(porRede, todasLinhas){
     return;
   }
 
-  // PRIMEIRO: PAINÉIS POR REDE
   redes.forEach(rede=>{
     const items = porRede[rede].slice().sort((a,b)=> b.pct - a.pct);
     const totalMeta = items.reduce((s,i)=>s+i.meta,0);
@@ -962,7 +954,6 @@ function renderBoards(porRede, todasLinhas){
     wrap.appendChild(board);
   });
 
-  // POR ÚLTIMO: PAINEL COM AGÊNCIAS ABAIXO DE 100%
   const abaixoDe100 = todasLinhas.filter(l => l.pct < 100).sort((a,b)=> a.pct - b.pct);
   
   if(abaixoDe100.length > 0){
