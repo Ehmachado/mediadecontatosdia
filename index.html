@@ -346,8 +346,10 @@
   }
 
   .board-export-content{
-    overflow:hidden;
+    overflow:visible;
     background:var(--theme-bg);
+    padding:20px;
+    min-width:100%;
   }
   
   .board-head{
@@ -441,34 +443,56 @@
     color:#fff; 
   }
 
-  .board-body{padding:20px 24px}
+  .board-body{
+    padding:20px 24px;
+  }
 
   table{
     width:100%; 
     border-collapse:separate; 
     border-spacing:0; 
-    overflow:hidden; 
+    overflow:visible; 
     border-radius:16px;
     box-shadow: 0 4px 16px rgba(0,0,0,.1);
+    table-layout:fixed;
   }
   
   thead th{
     text-align:left; 
     font-size:13px;
     color:var(--theme-text); 
-    padding:14px 12px;
+    padding:14px 16px;
     background:var(--theme-table-header); 
     border-bottom:2px solid rgba(0,0,0,.1);
     font-weight:700;
     text-transform:uppercase;
     letter-spacing:.5px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  
+  thead th:first-child{
+    width:35%;
+  }
+  
+  thead th:nth-child(2),
+  thead th:nth-child(3),
+  thead th:nth-child(4){
+    width:15%;
+  }
+  
+  thead th:last-child{
+    width:20%;
   }
   
   tbody td{
-    padding:14px 12px; 
+    padding:14px 16px; 
     font-size:14px; 
     border-bottom:1px solid rgba(0,0,0,.05); 
     color:var(--theme-text);
+    overflow:hidden;
+    text-overflow:ellipsis;
   }
   
   tbody tr:nth-child(odd){ 
@@ -1033,7 +1057,16 @@ async function exportBoardPNG(contentEl, rede){
   else if (theme === 'sunset') bgColor = '#fff7ed';
   else if (theme === 'forest') bgColor = '#f0fdf4';
   
-  const scale = 4;
+  // Adiciona padding extra temporariamente
+  const originalPadding = contentEl.style.padding;
+  contentEl.style.padding = '40px';
+  
+  const scale = 3;
+  
+  // Calcula dimensões com margem extra
+  const width = contentEl.scrollWidth + 80;
+  const height = contentEl.scrollHeight + 80;
+  
   const canvas = await html2canvas(contentEl, {
     backgroundColor: bgColor,
     scale,
@@ -1043,11 +1076,18 @@ async function exportBoardPNG(contentEl, rede){
     imageTimeout: 0,
     removeContainer: true,
     foreignObjectRendering: false,
-    width: contentEl.scrollWidth,
-    height: contentEl.scrollHeight,
-    windowWidth: contentEl.scrollWidth,
-    windowHeight: contentEl.scrollHeight
+    width: width,
+    height: height,
+    windowWidth: width,
+    windowHeight: height,
+    x: -40,
+    y: -40,
+    scrollX: 0,
+    scrollY: 0
   });
+  
+  // Restaura padding original
+  contentEl.style.padding = originalPadding;
   
   const link = document.createElement('a');
   link.download = `painel-${(rede||'rede').replace(/[^\w\-]+/g,'_')}.png`;
@@ -1065,7 +1105,7 @@ document.getElementById('btn-export-all').addEventListener('click', async ()=>{
   for (let i = 0; i < contents.length; i++){
     const board = contents[i].closest('.board');
     await exportBoardPNG(contents[i], board.dataset.rede || 'painel');
-    await new Promise(r=>setTimeout(r,400));
+    await new Promise(r=>setTimeout(r,500));
   }
   
   alert(`✓ ${contents.length} painéis exportados com sucesso!`);
