@@ -671,8 +671,8 @@ function pctBadge(p){
 
 function calculateHeight(numRows){
   const headerHeight = 180;
-  const rowHeight = 39;
-  const paddingBottom = 40;
+  const rowHeight = 40;
+  const paddingBottom = 60;
   
   const minHeight = 800;
   const calculatedHeight = headerHeight + (numRows * rowHeight) + paddingBottom;
@@ -1060,11 +1060,9 @@ async function exportBoardPNG(contentEl, rede){
   else if (theme === 'sunset') bgColor = '#fff7ed';
   else if (theme === 'forest') bgColor = '#f0fdf4';
   
-  const scale = 3.2;
-  
   const canvas = await html2canvas(contentEl, {
     backgroundColor: bgColor,
-    scale,
+    scale: 2,
     logging: false,
     useCORS: true,
     allowTaint: true,
@@ -1075,7 +1073,9 @@ async function exportBoardPNG(contentEl, rede){
     windowWidth: 500,
     windowHeight: height,
     scrollX: 0,
-    scrollY: 0
+    scrollY: 0,
+    y: 0,
+    x: 0
   });
   
   const link = document.createElement('a');
