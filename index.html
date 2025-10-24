@@ -586,7 +586,6 @@ footer {
         <div class="controls">
           <button class="btn btn-primary" id="btn-export-all">💾 Exportar Todas (PNG)</button>
           <button class="btn" id="btn-export-csv">📊 Exportar CSV</button>
-          <button class="btn" id="btn-toggle-preview">👁️ Mostrar/Ocultar Preview</button>
           <button class="btn" id="btn-clear">🗑️ Limpar Resultados</button>
         </div>
 
@@ -600,13 +599,6 @@ footer {
     </div>
 
     <div class="results" id="board-container"></div>
-    
-    <!-- Preview dos Painéis -->
-    <div class="panel" id="preview-section" style="display: none; margin-top: 30px;">
-      <h2>🔍 Preview dos Painéis</h2>
-      <div class="hint">Visualização dos painéis que serão exportados</div>
-      <div id="preview-container" style="display: grid; gap: 30px; margin-top: 20px;"></div>
-    </div>
   </div>
 
   <div class="export-container" id="export-container"></div>
@@ -843,20 +835,24 @@ function renderBoards(porRede, todasLinhas) {
           </div>
           <div>
             <div style="font-size: 13px; color: #64748b;">Agências</div>
-            <div style="font-size: 24px; font-weight: 800;">${items.length}</div>
+            <div style="font-size: 24px; font-weight: 800; color: #000000;">${items.length}</div>
           </div>
           <div>
             <div style="font-size: 13px; color: #64748b;">Meta</div>
-            <div style="font-size: 24px; font-weight: 800;">${formatNumber(totalMeta)}</div>
+            <div style="font-size: 24px; font-weight: 800; color: #000000;">${formatNumber(totalMeta)}</div>
           </div>
           <div>
             <div style="font-size: 13px; color: #64748b;">Realizado</div>
-            <div style="font-size: 24px; font-weight: 800;">${formatNumber(totalReal)}</div>
+            <div style="font-size: 24px; font-weight: 800; color: #000000;">${formatNumber(totalReal)}</div>
           </div>
         </div>
       </div>
       <div class="board-actions">
         <button class="btn" onclick="exportBoard('${nomeRede}')">💾 Exportar PNG</button>
+        <button class="btn" onclick="toggleIndividualPreview('${nomeRede}')">👁️ Preview</button>
+      </div>
+      <div id="preview-${nomeRede.replace(/[^\w]/g, '_')}" style="display: none; margin-top: 20px; padding: 20px; background: rgba(0,0,0,0.03); border-radius: 15px;">
+        <div style="transform: scale(0.7); transform-origin: top left; width: 714px;"></div>
       </div>
     `;
     boardList.appendChild(card);
@@ -884,20 +880,24 @@ function renderBoards(porRede, todasLinhas) {
           </div>
           <div>
             <div style="font-size: 13px; color: #64748b;">Agências</div>
-            <div style="font-size: 24px; font-weight: 800;">${abaixoDe100.length}</div>
+            <div style="font-size: 24px; font-weight: 800; color: #000000;">${abaixoDe100.length}</div>
           </div>
           <div>
             <div style="font-size: 13px; color: #64748b;">Meta Total</div>
-            <div style="font-size: 24px; font-weight: 800;">${formatNumber(totalMeta)}</div>
+            <div style="font-size: 24px; font-weight: 800; color: #000000;">${formatNumber(totalMeta)}</div>
           </div>
           <div>
             <div style="font-size: 13px; color: #64748b;">Realizado Total</div>
-            <div style="font-size: 24px; font-weight: 800;">${formatNumber(totalReal)}</div>
+            <div style="font-size: 24px; font-weight: 800; color: #000000;">${formatNumber(totalReal)}</div>
           </div>
         </div>
       </div>
       <div class="board-actions">
         <button class="btn" onclick="exportBoard('Abaixo_100')">💾 Exportar PNG</button>
+        <button class="btn" onclick="toggleIndividualPreview('Abaixo_100')">👁️ Preview</button>
+      </div>
+      <div id="preview-Abaixo_100" style="display: none; margin-top: 20px; padding: 20px; background: rgba(0,0,0,0.03); border-radius: 15px;">
+        <div style="transform: scale(0.7); transform-origin: top left; width: 714px;"></div>
       </div>
     `;
     boardList.appendChild(card);
@@ -1112,65 +1112,49 @@ function exportToCSV() {
   alert('✓ CSV exportado com sucesso!');
 }
 
-// ===== PREVIEW DOS PAINÉIS =====
-function togglePreview() {
-  const previewSection = document.getElementById('preview-section');
-  const previewContainer = document.getElementById('preview-container');
-  
+// ===== PREVIEW INDIVIDUAL DOS PAINÉIS =====
+function toggleIndividualPreview(nomeRede) {
   if (!window.boardData) {
     alert('❌ Nenhum dado disponível para preview');
     return;
   }
 
-  if (previewSection.style.display === 'none') {
-    previewSection.style.display = 'block';
-    generatePreview();
+  const safeNome = nomeRede.replace(/[^\w]/g, '_');
+  const previewDiv = document.getElementById(`preview-${safeNome}`);
+  const previewContent = previewDiv.querySelector('div');
+
+  if (previewDiv.style.display === 'none') {
+    // Mostrar preview
+    previewDiv.style.display = 'block';
+    
+    // Gerar conteúdo se ainda não existe
+    if (!previewContent.innerHTML) {
+      const { porRede, abaixoDe100 } = window.boardData;
+      
+      let items, stats, hasRedeColumn = false;
+      
+      if (nomeRede === 'Abaixo_100') {
+        items = abaixoDe100;
+        hasRedeColumn = true;
+        const totalMeta = items.reduce((sum, item) => sum + item.meta, 0);
+        const totalReal = items.reduce((sum, item) => sum + item.realizado, 0);
+        const pctGeral = totalMeta > 0 ? (totalReal / totalMeta) * 100 : 0;
+        stats = { meta: totalMeta, realizado: totalReal, percentual: pctGeral };
+        const html = createBoardHTML('⚠️ Abaixo de 100%', items, stats, currentTheme, hasRedeColumn);
+        previewContent.innerHTML = html;
+      } else {
+        items = porRede[nomeRede];
+        const totalMeta = items.reduce((sum, item) => sum + item.meta, 0);
+        const totalReal = items.reduce((sum, item) => sum + item.realizado, 0);
+        const pctGeral = totalMeta > 0 ? (totalReal / totalMeta) * 100 : 0;
+        stats = { meta: totalMeta, realizado: totalReal, percentual: pctGeral };
+        const html = createBoardHTML(nomeRede, items, stats, currentTheme, false);
+        previewContent.innerHTML = html;
+      }
+    }
   } else {
-    previewSection.style.display = 'none';
-    previewContainer.innerHTML = '';
-  }
-}
-
-function generatePreview() {
-  const previewContainer = document.getElementById('preview-container');
-  const { porRede, abaixoDe100 } = window.boardData;
-  
-  previewContainer.innerHTML = '';
-
-  // Preview para cada rede
-  const redesOrdenadas = Object.keys(porRede).sort((a, b) => 
-    a.localeCompare(b, 'pt-BR', { sensitivity: 'base' })
-  );
-
-  redesOrdenadas.forEach(nomeRede => {
-    const items = porRede[nomeRede];
-    const totalMeta = items.reduce((sum, item) => sum + item.meta, 0);
-    const totalReal = items.reduce((sum, item) => sum + item.realizado, 0);
-    const pctGeral = totalMeta > 0 ? (totalReal / totalMeta) * 100 : 0;
-    const stats = { meta: totalMeta, realizado: totalReal, percentual: pctGeral };
-
-    const html = createBoardHTML(nomeRede, items, stats, currentTheme, false);
-    const wrapper = document.createElement('div');
-    wrapper.style.transform = 'scale(0.8)';
-    wrapper.style.transformOrigin = 'top left';
-    wrapper.style.marginBottom = '20px';
-    wrapper.innerHTML = html;
-    previewContainer.appendChild(wrapper);
-  });
-
-  // Preview para Abaixo de 100%
-  if (abaixoDe100.length > 0) {
-    const totalMeta = abaixoDe100.reduce((sum, item) => sum + item.meta, 0);
-    const totalReal = abaixoDe100.reduce((sum, item) => sum + item.realizado, 0);
-    const pctGeral = totalMeta > 0 ? (totalReal / totalMeta) * 100 : 0;
-    const stats = { meta: totalMeta, realizado: totalReal, percentual: pctGeral };
-
-    const html = createBoardHTML('⚠️ Abaixo de 100%', abaixoDe100, stats, currentTheme, true);
-    const wrapper = document.createElement('div');
-    wrapper.style.transform = 'scale(0.8)';
-    wrapper.style.transformOrigin = 'top left';
-    wrapper.innerHTML = html;
-    previewContainer.appendChild(wrapper);
+    // Ocultar preview
+    previewDiv.style.display = 'none';
   }
 }
 
@@ -1206,8 +1190,6 @@ function clearAllData() {
   // Limpar resultados
   document.getElementById('results-area').innerHTML = '<div class="empty-state">Aguardando dados...<br />Preencha os campos ao lado e clique em Processar</div>';
   document.getElementById('board-container').innerHTML = '';
-  document.getElementById('preview-section').style.display = 'none';
-  document.getElementById('preview-container').innerHTML = '';
   window.boardData = null;
 
   alert('✓ Todos os dados foram limpos!');
@@ -1331,9 +1313,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Exportar CSV
   document.getElementById('btn-export-csv').addEventListener('click', exportToCSV);
 
-  // Toggle Preview
-  document.getElementById('btn-toggle-preview').addEventListener('click', togglePreview);
-
   // Salvar todos os campos
   document.getElementById('btn-save-all').addEventListener('click', saveAllFields);
 
@@ -1345,8 +1324,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (confirm('Deseja limpar todos os resultados?')) {
       document.getElementById('results-area').innerHTML = '<div class="empty-state">Aguardando dados...<br />Preencha os campos ao lado e clique em Processar</div>';
       document.getElementById('board-container').innerHTML = '';
-      document.getElementById('preview-section').style.display = 'none';
-      document.getElementById('preview-container').innerHTML = '';
       window.boardData = null;
     }
   });
@@ -1365,8 +1342,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Expor função para uso global
+// Expor funções para uso global
 window.exportBoard = exportBoard;
+window.toggleIndividualPreview = toggleIndividualPreview;
 </script>
 </body>
 </html>
