@@ -535,7 +535,7 @@ footer {
 
         <div>
           <h3 style="font-size: 16px; margin-bottom: 10px; color: white;">Contatos Realizados</h3>
-          <div class="hint">7 colunas (usa coluna 2 e 7) OU 2 colunas simples: Dependência | Quantidade</div>
+          <div class="hint">A última coluna sempre deve conter o número de contatos. Formato: Dependência | ... | Contatos</div>
           <textarea id="txt-contatos" placeholder="Cód;Agência 123;UF;...;...;...;28&#10;OU&#10;Agência 123;28"></textarea>
         </div>
 
@@ -707,15 +707,15 @@ function processData(carteirasText, contatosText, redesText) {
     let qtd = 0;
 
     if (row.length >= 7) {
-      // Formato com 7 colunas
+      // Formato com 7 ou mais colunas - última coluna é sempre contatos
       dep = String(row[1] || '').trim();
-      const qtdStr = String(row[6] || '').trim();
+      const qtdStr = String(row[row.length - 1] || '').trim();
       if (!/\d/.test(qtdStr)) return;
       qtd = toNumber(qtdStr);
     } else if (row.length >= 2) {
-      // Formato com 2 colunas
+      // Formato com 2 colunas - última coluna é contatos
       dep = String(row[0] || '').trim();
-      const qtdStr = String(row[1] || '').trim();
+      const qtdStr = String(row[row.length - 1] || '').trim();
       if (!/\d/.test(qtdStr)) return;
       qtd = toNumber(qtdStr);
     } else {
