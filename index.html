@@ -496,6 +496,34 @@ footer {
   color: #94a3b8;
   font-size: 14px;
 }
+
+/* Estilos para tabelas de preview */
+.preview-table th {
+  background: rgba(0, 51, 160, 0.2);
+  padding: 8px 12px;
+  text-align: left;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #FFCC00;
+}
+
+.preview-table td {
+  padding: 6px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(15, 23, 42, 0.3);
+}
+
+.preview-table tr:hover td {
+  background: rgba(255, 204, 0, 0.1);
+}
+
+.preview-table .highlight-column {
+  background: rgba(255, 204, 0, 0.2) !important;
+  font-weight: 700;
+  color: #FFCC00;
+}
 </style>
 </head>
 <body>
@@ -519,6 +547,12 @@ footer {
           <h3 style="font-size: 16px; margin-bottom: 10px; color: white;">Carteiras por Agência</h3>
           <div class="hint">3 colunas: Nome | Dependência | Carteira (Meta = 10 × carteiras)</div>
           <textarea id="txt-carteiras" placeholder="Maria Silva;Agência 123;Grupo A&#10;João Souza;Agência 456;Grupo B"></textarea>
+          
+          <div id="preview-table-carteiras" style="display: none; margin-top: 15px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; overflow-x: auto;">
+            <div style="font-size: 12px; color: #94a3b8; margin-bottom: 10px; font-weight: 600;">📋 Prévia da Tabela:</div>
+            <table id="table-carteiras" style="width: 100%; border-collapse: collapse; font-size: 12px; color: #e2e8f0;"></table>
+          </div>
+          
           <div class="controls">
             <div class="file-input">
               <button class="btn">📁 Carregar Arquivo</button>
@@ -537,6 +571,11 @@ footer {
           <h3 style="font-size: 16px; margin-bottom: 10px; color: white;">Contatos Realizados</h3>
           <div class="hint">A última coluna sempre deve conter o número de contatos. Formato: Dependência | ... | Contatos</div>
           <textarea id="txt-contatos" placeholder="Cód;Agência 123;UF;...;...;...;28&#10;OU&#10;Agência 123;28"></textarea>
+          
+          <div id="preview-table-contatos" style="display: none; margin-top: 15px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; overflow-x: auto;">
+            <div style="font-size: 12px; color: #94a3b8; margin-bottom: 10px; font-weight: 600;">📋 Prévia da Tabela (última coluna = <span style="color: #FFCC00; font-weight: 800;">Contatos</span>):</div>
+            <table id="table-contatos" style="width: 100%; border-collapse: collapse; font-size: 12px; color: #e2e8f0;"></table>
+          </div>
         </div>
 
         <hr />
@@ -545,6 +584,12 @@ footer {
           <h3 style="font-size: 16px; margin-bottom: 10px; color: white;">Mapeamento de Redes</h3>
           <div class="hint">3 colunas: Prefixo | Dependência | Nome da Rede</div>
           <textarea id="txt-redes" placeholder="123;Agência 123;Rede Oeste&#10;456;Agência 456;Rede Centro"></textarea>
+          
+          <div id="preview-table-redes" style="display: none; margin-top: 15px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; overflow-x: auto;">
+            <div style="font-size: 12px; color: #94a3b8; margin-bottom: 10px; font-weight: 600;">📋 Prévia da Tabela:</div>
+            <table id="table-redes" style="width: 100%; border-collapse: collapse; font-size: 12px; color: #e2e8f0;"></table>
+          </div>
+          
           <div class="controls">
             <div class="file-input">
               <button class="btn">📁 Carregar Arquivo</button>
@@ -616,6 +661,62 @@ const LS_KEYS = {
 };
 
 // ===== FUNÇÕES UTILITÁRIAS =====
+function renderPreviewTable(textareaId, tableId, previewId, highlightLastColumn = false) {
+  const textarea = document.getElementById(textareaId);
+  const table = document.getElementById(tableId);
+  const preview = document.getElementById(previewId);
+  
+  const text = textarea.value.trim();
+  
+  if (!text) {
+    preview.style.display = 'none';
+    return;
+  }
+  
+  const rows = parseTable(text);
+  
+  if (rows.length === 0) {
+    preview.style.display = 'none';
+    return;
+  }
+  
+  preview.style.display = 'block';
+  
+  // Determinar número máximo de colunas
+  const maxCols = Math.max(...rows.map(row => row.length));
+  
+  // Criar cabeçalho
+  let headerHTML = '<thead><tr>';
+  for (let i = 0; i < maxCols; i++) {
+    const isLastCol = highlightLastColumn && (i === maxCols - 1);
+    headerHTML += `<th class="${isLastCol ? 'highlight-column' : ''}">Col ${i + 1}${isLastCol ? ' (Contatos)' : ''}</th>`;
+  }
+  headerHTML += '</tr></thead>';
+  
+  // Criar corpo
+  let bodyHTML = '<tbody>';
+  const maxRows = Math.min(rows.length, 10); // Mostrar no máximo 10 linhas
+  
+  for (let i = 0; i < maxRows; i++) {
+    bodyHTML += '<tr>';
+    for (let j = 0; j < maxCols; j++) {
+      const cell = rows[i][j] || '';
+      const isLastCol = highlightLastColumn && (j === maxCols - 1);
+      bodyHTML += `<td class="${isLastCol ? 'highlight-column' : ''}">${cell}</td>`;
+    }
+    bodyHTML += '</tr>';
+  }
+  
+  if (rows.length > 10) {
+    bodyHTML += `<tr><td colspan="${maxCols}" style="text-align: center; color: #94a3b8; font-style: italic;">... e mais ${rows.length - 10} linhas</td></tr>`;
+  }
+  
+  bodyHTML += '</tbody>';
+  
+  table.className = 'preview-table';
+  table.innerHTML = headerHTML + bodyHTML;
+}
+
 function detectDelimiter(text) {
   const semicolons = (text.match(/;/g) || []).length;
   const commas = (text.match(/,/g) || []).length;
@@ -1224,6 +1325,68 @@ async function exportAllBoards() {
 
 // ===== EVENT LISTENERS =====
 document.addEventListener('DOMContentLoaded', () => {
+  // Função para processar paste de tabelas
+  function handleTablePaste(e, textareaId) {
+    const clipboardData = e.clipboardData || window.clipboardData;
+    const pastedData = clipboardData.getData('text');
+    
+    // Detectar se é uma tabela (contém tabs ou múltiplas células)
+    if (pastedData.includes('\t') || pastedData.includes('\r\n') || pastedData.includes('\n')) {
+      e.preventDefault();
+      
+      // Converter tabs em ponto-e-vírgula
+      const converted = pastedData
+        .split(/\r?\n/)
+        .map(line => line.split('\t').join(';'))
+        .filter(line => line.trim())
+        .join('\n');
+      
+      const textarea = document.getElementById(textareaId);
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const currentValue = textarea.value;
+      
+      // Inserir o texto convertido na posição do cursor
+      textarea.value = currentValue.substring(0, start) + converted + currentValue.substring(end);
+      
+      // Reposicionar cursor
+      const newPosition = start + converted.length;
+      textarea.setSelectionRange(newPosition, newPosition);
+      textarea.focus();
+      
+      // Renderizar preview
+      updatePreviewForTextarea(textareaId);
+    }
+  }
+  
+  // Função para atualizar preview baseado no textarea
+  function updatePreviewForTextarea(textareaId) {
+    if (textareaId === 'txt-carteiras') {
+      renderPreviewTable('txt-carteiras', 'table-carteiras', 'preview-table-carteiras', false);
+    } else if (textareaId === 'txt-contatos') {
+      renderPreviewTable('txt-contatos', 'table-contatos', 'preview-table-contatos', true);
+    } else if (textareaId === 'txt-redes') {
+      renderPreviewTable('txt-redes', 'table-redes', 'preview-table-redes', false);
+    }
+  }
+
+  // Adicionar listeners de paste para os 3 campos
+  document.getElementById('txt-carteiras').addEventListener('paste', (e) => handleTablePaste(e, 'txt-carteiras'));
+  document.getElementById('txt-contatos').addEventListener('paste', (e) => handleTablePaste(e, 'txt-contatos'));
+  document.getElementById('txt-redes').addEventListener('paste', (e) => handleTablePaste(e, 'txt-redes'));
+  
+  // Adicionar listeners de input para atualizar preview ao digitar
+  document.getElementById('txt-carteiras').addEventListener('input', () => updatePreviewForTextarea('txt-carteiras'));
+  document.getElementById('txt-contatos').addEventListener('input', () => updatePreviewForTextarea('txt-contatos'));
+  document.getElementById('txt-redes').addEventListener('input', () => updatePreviewForTextarea('txt-redes'));
+  
+  // Renderizar previews iniciais se houver dados salvos
+  setTimeout(() => {
+    updatePreviewForTextarea('txt-carteiras');
+    updatePreviewForTextarea('txt-contatos');
+    updatePreviewForTextarea('txt-redes');
+  }, 100);
+
   // Temas
   document.querySelectorAll('.theme-option').forEach(option => {
     option.addEventListener('click', () => {
