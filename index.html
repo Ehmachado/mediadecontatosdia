@@ -268,7 +268,7 @@ textarea:focus {
 .board-content[data-theme="forest"] { background: #f0fdf4; }
 
 .board-header {
-  padding: 30px 25px;
+  padding: 21px 18px;
   background: linear-gradient(135deg, #0033A0 0%, #0052cc 100%);
 }
 
@@ -292,22 +292,22 @@ textarea:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 15px;
-  padding: 15px 25px;
+  gap: 12px;
+  padding: 10px 20px;
   border-radius: 50px;
   background: rgba(0, 0, 0, 0.2);
   border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .board-logo {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   background: #FFCC00;
-  border-radius: 10px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 900;
   color: #000;
 }
@@ -317,7 +317,7 @@ textarea:focus {
 }
 
 .board-super {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.8);
   text-transform: uppercase;
@@ -325,7 +325,7 @@ textarea:focus {
 }
 
 .board-name {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 900;
   color: white;
   margin-top: 2px;
@@ -334,15 +334,15 @@ textarea:focus {
 .board-stats {
   display: flex;
   justify-content: center;
-  gap: 15px;
-  margin-top: 15px;
+  gap: 12px;
+  margin-top: 12px;
   flex-wrap: wrap;
-  font-size: 14px;
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.95);
 }
 
 .stat-badge {
-  padding: 8px 16px;
+  padding: 6px 14px;
   border-radius: 50px;
   font-weight: 800;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -354,7 +354,7 @@ textarea:focus {
 .badge-critical { background: #C62828; color: white; }
 
 .board-body {
-  padding: 25px 20px;
+  padding: 18px 15px;
 }
 
 .board-table {
@@ -368,9 +368,9 @@ textarea:focus {
 
 .board-table thead th {
   background: #E9F1FF;
-  padding: 14px 12px;
+  padding: 10px 10px;
   text-align: left;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
   color: #0b1026;
   text-transform: uppercase;
@@ -399,8 +399,8 @@ textarea:focus {
 }
 
 .board-table tbody td {
-  padding: 14px 12px;
-  font-size: 14px;
+  padding: 10px 10px;
+  font-size: 12px;
   color: #0b1026;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
@@ -471,10 +471,10 @@ textarea:focus {
 
 .cell-badge {
   display: inline-block;
-  padding: 6px 12px;
+  padding: 5px 10px;
   border-radius: 50px;
   font-weight: 800;
-  font-size: 13px;
+  font-size: 11px;
 }
 
 .empty-state {
@@ -897,11 +897,11 @@ function renderBoards(porRede, todasLinhas) {
 function createBoardHTML(nomeRede, items, stats, theme, hasRedeColumn = false) {
   const badge = getBadgeClass(stats.percentual);
   
-  // Calcular altura dinâmica
-  const HEADER_HEIGHT = 200;
-  const ROW_HEIGHT = 50;
-  const PADDING = 50;
-  const height = Math.max(800, HEADER_HEIGHT + (items.length * ROW_HEIGHT) + PADDING);
+  // Cálculo ajustado da altura (redução de 30% nas linhas e cabeçalho)
+  const HEADER_HEIGHT = 140;  // Reduzido de 200 para 140 (30% menor)
+  const ROW_HEIGHT = 35;      // Reduzido de 50 para 35 (30% menor)
+  const PADDING = 40;         // Reduzido de 50 para 40
+  const height = Math.max(600, HEADER_HEIGHT + (items.length * ROW_HEIGHT) + PADDING);
 
   const themeMap = {
     'classic': '',
