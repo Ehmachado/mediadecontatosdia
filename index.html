@@ -901,7 +901,7 @@ function createBoardHTML(nomeRede, items, stats, theme, hasRedeColumn = false) {
   const HEADER_HEIGHT = 140;  // Reduzido de 200 para 140 (30% menor)
   const ROW_HEIGHT = 35;      // Reduzido de 50 para 35 (30% menor)
   const PADDING = 40;         // Reduzido de 50 para 40
-  const height = Math.max(600, HEADER_HEIGHT + (items.length * ROW_HEIGHT) + PADDING);
+  const height = HEADER_HEIGHT + (items.length * ROW_HEIGHT) + PADDING;
 
   const themeMap = {
     'classic': '',
