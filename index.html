@@ -571,6 +571,11 @@ footer {
         <div class="controls" style="margin-top: 25px;">
           <button class="btn btn-primary" id="btn-processar" style="flex: 1;">⚡ Processar & Gerar Painéis</button>
         </div>
+        
+        <div class="controls" style="margin-top: 15px;">
+          <button class="btn" id="btn-save-all">💾 Salvar Todos os Campos</button>
+          <button class="btn" id="btn-clear-all">🗑️ Limpar Todos os Dados</button>
+        </div>
       </div>
 
       <!-- PAINEL DE RESULTADOS -->
@@ -579,7 +584,9 @@ footer {
         <div class="hint">Painéis organizados por rede com opções de exportação individual ou em lote</div>
         
         <div class="controls">
-          <button class="btn btn-primary" id="btn-export-all">💾 Exportar Todas as Redes (PNG)</button>
+          <button class="btn btn-primary" id="btn-export-all">💾 Exportar Todas (PNG)</button>
+          <button class="btn" id="btn-export-csv">📊 Exportar CSV</button>
+          <button class="btn" id="btn-toggle-preview">👁️ Mostrar/Ocultar Preview</button>
           <button class="btn" id="btn-clear">🗑️ Limpar Resultados</button>
         </div>
 
@@ -593,6 +600,13 @@ footer {
     </div>
 
     <div class="results" id="board-container"></div>
+    
+    <!-- Preview dos Painéis -->
+    <div class="panel" id="preview-section" style="display: none; margin-top: 30px;">
+      <h2>🔍 Preview dos Painéis</h2>
+      <div class="hint">Visualização dos painéis que serão exportados</div>
+      <div id="preview-container" style="display: grid; gap: 30px; margin-top: 20px;"></div>
+    </div>
   </div>
 
   <div class="export-container" id="export-container"></div>
@@ -890,7 +904,7 @@ function renderBoards(porRede, todasLinhas) {
   }
 
   // Armazenar dados para exportação
-  window.boardData = { porRede, abaixoDe100 };
+  window.boardData = { porRede, abaixoDe100, todasLinhas };
 }
 
 // ===== EXPORTAÇÃO DE PAINÉIS =====
@@ -899,9 +913,10 @@ function createBoardHTML(nomeRede, items, stats, theme, hasRedeColumn = false) {
   
   // Cálculo ajustado da altura (redução de 30% nas linhas e cabeçalho)
   const HEADER_HEIGHT = 140;  // Reduzido de 200 para 140 (30% menor)
-  const ROW_HEIGHT = 35;      // Reduzido de 50 para 35 (30% menor)
-  const PADDING = 40;         // Reduzido de 50 para 40
-  const height = HEADER_HEIGHT + (items.length * ROW_HEIGHT) + PADDING;
+  const ROW_HEIGHT = 42;      // Aumentado para garantir espaço suficiente
+  const THEAD_HEIGHT = 50;    // Altura específica para o cabeçalho da tabela
+  const PADDING = 60;         // Aumentado para garantir espaço
+  const height = HEADER_HEIGHT + THEAD_HEIGHT + (items.length * ROW_HEIGHT) + PADDING;
 
   const themeMap = {
     'classic': '',
@@ -999,7 +1014,7 @@ async function exportBoard(nomeRede) {
   container.innerHTML = html;
 
   const element = container.firstElementChild;
-  const height = parseInt(element.style.height);
+  const finalHeight = Math.max(parseInt(element.style.height), element.scrollHeight);
 
   try {
     const canvas = await html2canvas(element, {
@@ -1009,9 +1024,9 @@ async function exportBoard(nomeRede) {
                       currentTheme === 'forest' ? '#f0fdf4' : '#ffffff',
       scale: 2,
       width: 500,
-      height: height,
+      height: finalHeight,
       windowWidth: 500,
-      windowHeight: height,
+      windowHeight: finalHeight,
       logging: false,
       useCORS: true
     });
@@ -1029,6 +1044,168 @@ async function exportBoard(nomeRede) {
   } finally {
     container.innerHTML = '';
   }
+}
+
+async function exportAllBoards() {
+  if (!window.boardData) {
+    alert('❌ Nenhum dado disponível para exportar');
+    return;
+  }
+
+  const { porRede, abaixoDe100 } = window.boardData;
+  const redes = Object.keys(porRede);
+  
+  let total = redes.length;
+  if (abaixoDe100.length > 0) total++;
+
+  if (!confirm(`Deseja exportar ${total} painéis em PNG?`)) return;
+
+  for (const rede of redes) {
+    await exportBoard(rede);
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+
+  if (abaixoDe100.length > 0) {
+    await exportBoard('Abaixo_100');
+  }
+
+  alert(`✓ ${total} painéis exportados com sucesso!`);
+}
+
+// ===== EXPORTAÇÃO CSV =====
+function exportToCSV() {
+  if (!window.boardData) {
+    alert('❌ Nenhum dado disponível para exportar');
+    return;
+  }
+
+  const { todasLinhas } = window.boardData;
+  if (!todasLinhas || todasLinhas.length === 0) {
+    alert('❌ Nenhum dado disponível para exportar');
+    return;
+  }
+
+  // Criar cabeçalho CSV
+  let csv = 'Rede;Dependência;Carteiras;Meta;Realizado;Percentual (%)\n';
+
+  // Adicionar dados
+  todasLinhas.forEach(linha => {
+    csv += `${linha.rede};${linha.dependencia};${linha.carteiras};${linha.meta};${linha.realizado};${formatPercent(linha.percentual)}\n`;
+  });
+
+  // Criar blob e download
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'paineis_metas_contatos.csv');
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  alert('✓ CSV exportado com sucesso!');
+}
+
+// ===== PREVIEW DOS PAINÉIS =====
+function togglePreview() {
+  const previewSection = document.getElementById('preview-section');
+  const previewContainer = document.getElementById('preview-container');
+  
+  if (!window.boardData) {
+    alert('❌ Nenhum dado disponível para preview');
+    return;
+  }
+
+  if (previewSection.style.display === 'none') {
+    previewSection.style.display = 'block';
+    generatePreview();
+  } else {
+    previewSection.style.display = 'none';
+    previewContainer.innerHTML = '';
+  }
+}
+
+function generatePreview() {
+  const previewContainer = document.getElementById('preview-container');
+  const { porRede, abaixoDe100 } = window.boardData;
+  
+  previewContainer.innerHTML = '';
+
+  // Preview para cada rede
+  const redesOrdenadas = Object.keys(porRede).sort((a, b) => 
+    a.localeCompare(b, 'pt-BR', { sensitivity: 'base' })
+  );
+
+  redesOrdenadas.forEach(nomeRede => {
+    const items = porRede[nomeRede];
+    const totalMeta = items.reduce((sum, item) => sum + item.meta, 0);
+    const totalReal = items.reduce((sum, item) => sum + item.realizado, 0);
+    const pctGeral = totalMeta > 0 ? (totalReal / totalMeta) * 100 : 0;
+    const stats = { meta: totalMeta, realizado: totalReal, percentual: pctGeral };
+
+    const html = createBoardHTML(nomeRede, items, stats, currentTheme, false);
+    const wrapper = document.createElement('div');
+    wrapper.style.transform = 'scale(0.8)';
+    wrapper.style.transformOrigin = 'top left';
+    wrapper.style.marginBottom = '20px';
+    wrapper.innerHTML = html;
+    previewContainer.appendChild(wrapper);
+  });
+
+  // Preview para Abaixo de 100%
+  if (abaixoDe100.length > 0) {
+    const totalMeta = abaixoDe100.reduce((sum, item) => sum + item.meta, 0);
+    const totalReal = abaixoDe100.reduce((sum, item) => sum + item.realizado, 0);
+    const pctGeral = totalMeta > 0 ? (totalReal / totalMeta) * 100 : 0;
+    const stats = { meta: totalMeta, realizado: totalReal, percentual: pctGeral };
+
+    const html = createBoardHTML('⚠️ Abaixo de 100%', abaixoDe100, stats, currentTheme, true);
+    const wrapper = document.createElement('div');
+    wrapper.style.transform = 'scale(0.8)';
+    wrapper.style.transformOrigin = 'top left';
+    wrapper.innerHTML = html;
+    previewContainer.appendChild(wrapper);
+  }
+}
+
+// ===== FUNÇÕES DE SALVAR E LIMPAR =====
+function saveAllFields() {
+  const carteiras = document.getElementById('txt-carteiras').value;
+  const redes = document.getElementById('txt-redes').value;
+
+  localStorage.setItem(LS_KEYS.carteiras, carteiras);
+  localStorage.setItem(LS_KEYS.redes, redes);
+
+  alert('✓ Todos os campos foram salvos!');
+}
+
+function clearAllData() {
+  if (!confirm('Deseja realmente limpar todos os dados salvos e campos? Esta ação não pode ser desfeita.')) {
+    return;
+  }
+
+  // Limpar campos
+  document.getElementById('txt-carteiras').value = '';
+  document.getElementById('txt-contatos').value = '';
+  document.getElementById('txt-redes').value = '';
+
+  // Limpar localStorage
+  localStorage.removeItem(LS_KEYS.carteiras);
+  localStorage.removeItem(LS_KEYS.redes);
+
+  // Desmarcar checkboxes
+  document.getElementById('save-carteiras').checked = false;
+  document.getElementById('save-redes').checked = false;
+
+  // Limpar resultados
+  document.getElementById('results-area').innerHTML = '<div class="empty-state">Aguardando dados...<br />Preencha os campos ao lado e clique em Processar</div>';
+  document.getElementById('board-container').innerHTML = '';
+  document.getElementById('preview-section').style.display = 'none';
+  document.getElementById('preview-container').innerHTML = '';
+  window.boardData = null;
+
+  alert('✓ Todos os dados foram limpos!');
 }
 
 async function exportAllBoards() {
@@ -1145,11 +1322,25 @@ document.addEventListener('DOMContentLoaded', () => {
   // Exportar todos
   document.getElementById('btn-export-all').addEventListener('click', exportAllBoards);
 
+  // Exportar CSV
+  document.getElementById('btn-export-csv').addEventListener('click', exportToCSV);
+
+  // Toggle Preview
+  document.getElementById('btn-toggle-preview').addEventListener('click', togglePreview);
+
+  // Salvar todos os campos
+  document.getElementById('btn-save-all').addEventListener('click', saveAllFields);
+
+  // Limpar todos os dados
+  document.getElementById('btn-clear-all').addEventListener('click', clearAllData);
+
   // Limpar
   document.getElementById('btn-clear').addEventListener('click', () => {
     if (confirm('Deseja limpar todos os resultados?')) {
       document.getElementById('results-area').innerHTML = '<div class="empty-state">Aguardando dados...<br />Preencha os campos ao lado e clique em Processar</div>';
       document.getElementById('board-container').innerHTML = '';
+      document.getElementById('preview-section').style.display = 'none';
+      document.getElementById('preview-container').innerHTML = '';
       window.boardData = null;
     }
   });
