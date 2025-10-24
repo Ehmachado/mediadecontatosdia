@@ -911,12 +911,12 @@ function renderBoards(porRede, todasLinhas) {
 function createBoardHTML(nomeRede, items, stats, theme, hasRedeColumn = false) {
   const badge = getBadgeClass(stats.percentual);
   
-  // Cálculo ajustado da altura (redução de 30% nas linhas e cabeçalho)
-  const HEADER_HEIGHT = 140;  // Reduzido de 200 para 140 (30% menor)
-  const ROW_HEIGHT = 42;      // Aumentado para garantir espaço suficiente
-  const THEAD_HEIGHT = 50;    // Altura específica para o cabeçalho da tabela
-  const PADDING = 60;         // Aumentado para garantir espaço
-  const height = HEADER_HEIGHT + THEAD_HEIGHT + (items.length * ROW_HEIGHT) + PADDING;
+  // Cálculo de altura dinâmica baseada no conteúdo real
+  const HEADER_HEIGHT = 140;  // Cabeçalho do painel
+  const ROW_HEIGHT = 32;      // Altura de cada linha da tabela
+  const THEAD_HEIGHT = 42;    // Altura do cabeçalho da tabela
+  const PADDING = 50;         // Padding do body e margem de segurança
+  const calculatedHeight = HEADER_HEIGHT + THEAD_HEIGHT + (items.length * ROW_HEIGHT) + PADDING;
 
   const themeMap = {
     'classic': '',
@@ -956,7 +956,7 @@ function createBoardHTML(nomeRede, items, stats, theme, hasRedeColumn = false) {
   }).join('');
 
   return `
-    <div class="board-content" data-theme="${themeAttr}" style="height: ${height}px;">
+    <div class="board-content" data-theme="${themeAttr}" style="height: ${calculatedHeight}px;">
       <div class="board-header" data-theme="${themeAttr}">
         <div class="board-title-wrap">
           <div class="board-logo">BB</div>
@@ -1014,7 +1014,12 @@ async function exportBoard(nomeRede) {
   container.innerHTML = html;
 
   const element = container.firstElementChild;
-  const finalHeight = Math.max(parseInt(element.style.height), element.scrollHeight);
+  
+  // Aguardar renderização completa
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
+  // Usar a maior altura entre calculada e real
+  const finalHeight = Math.max(parseInt(element.style.height) || 0, element.scrollHeight, element.offsetHeight);
 
   try {
     const canvas = await html2canvas(element, {
@@ -1208,6 +1213,7 @@ function clearAllData() {
   alert('✓ Todos os dados foram limpos!');
 }
 
+// ===== EXPORTAÇÃO EM LOTE =====
 async function exportAllBoards() {
   if (!window.boardData) {
     alert('❌ Nenhum dado disponível para exportar');
